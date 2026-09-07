@@ -43,33 +43,51 @@ to offer customers the same flexibility.
 
 Two types:
 
-| Type | How they order | How they pay |
-|---|---|---|
-| **Casual / daily** | Place order before a fixed nightly **cutoff** (target ~9 pm) for next-morning delivery. No commitment. | Delivery boy collects **per delivery** — UPI or cash on the spot. |
-| **Regular / fixed** | Standing daily quantity. Pause anytime — over **WhatsApp** initially, self-service in the app later. | **Prepaid recharge** or **monthly bill** — final model to be decided. |
+| Type | How they order | How they pay | Perks |
+|---|---|---|---|
+| **Casual / daily** | Order before a fixed nightly **cutoff** (~9 pm) for next-morning delivery. No commitment. | Per delivery — UPI or cash on the spot. | None |
+| **Regular / fixed** | Standing daily quantity. Pause anytime before the cutoff — WhatsApp first, app later. Pays even if they forget to pause. | **Prepaid recharge** or **monthly bill** — TBD. | Guaranteed supply on short days; ₹60/kg locked for 6 months; earlier slot; priority on extras. |
 
 **Goal:** convince casual customers to become regular fixed customers.
 
+## Capacity and economics (see 0006)
+
+- Herd: **8–10 buffalo → ~70–80 kg/day max**, and only if halwais are bypassed.
+  Retail gets a **carve-out** of that, not all of it.
+- **50 households (~50–75 kg/day) ≈ the whole herd** — a medium-term ceiling,
+  not a launch number. Launch is really ~15–20 households / ~20–30 kg/day.
+- Margin ₹5/kg → ~₹2,700/month gross at 15 regulars. **Net negative until
+  ~40–50 kg/day.**
+- Therefore: **operator delivers themselves at launch**; paid delivery boy and
+  the price step-up both wait until ~40–50 kg/day. Herd expansion is the growth
+  lever.
+
 ## Operations
 
-- **Delivery:** one delivery boy, morning round.
-- **Area:** small / single locality at start. Exact boundary TBD.
-- **Go / no-go gate:** do **not** expand (more routes, more staff, price
-  changes, full app build) until **15 regular fixed customers** are signed.
+- **Delivery:** morning round, run by the operator at launch (hired help later).
+- **Sellers:** operator + Aman + Manjeet all bring in customers (word of mouth).
+- **Area:** one locality, ~50 households in reach.
+- **Launch target:** November 2026 (real trigger: dairy producing).
+- **Go / no-go gate:** do **not** expand area / hire / change price until
+  **15 regular fixed customers** are signed — target within 1 month of launch.
+- **Tooling from day one:** thin internal app (operator + delivery runner) plus
+  a WhatsApp ordering bot. No customer logins/payments in-app at launch. (0004)
 
 ## Open questions / risks
 
 1. **No written supply agreement.** Friends + verbal terms is the classic
-   blow-up. Need on paper: guaranteed quantity, price, notice period, and what
-   happens when halwai demand spikes and milk is tight.
+   blow-up. Need on paper: the daily kg **carve-out** reserved for retail,
+   price, notice period, and priority when halwai demand spikes and milk is
+   tight.
 2. **Cost price is a placeholder.** ₹55/kg is assumed, not agreed.
-3. **Thin margin.** ₹5/kg leaves almost nothing for fuel, the delivery boy,
-   packaging, and our time. Plan the price step-up / delivery fee trigger
-   deliberately, don't drift.
-4. **Regular-customer payment model** (prepaid vs monthly) is undecided.
-5. **Delivery area + daily capacity ceiling** not defined.
+3. **Loss-making at launch scale.** ~₹2,700/month gross at 15 regulars won't
+   cover a delivery wage. Mitigation is decided (operator delivers, price
+   step-up at ~40–50 kg/day) but the plan runs thin until volume grows.
+4. **Herd size caps growth.** Can't reach 50 households without more buffalo or
+   pulling volume off the halwais — needs a conversation with the dairy.
+5. **Regular-customer payment model** (prepaid vs monthly) is undecided.
 6. **Business name and legal structure** not decided (repo name "M-cli" is a
    placeholder).
-7. **Positioning** vs packet milk (Amul / Mother Dairy) and vs the local
-   doodhwala needs to be stated explicitly — presumably "pure, unadulterated
-   buffalo milk, delivered, order as little as you want."
+7. **WhatsApp bot cost/setup** — real bot needs WhatsApp Business API via a
+   provider (verification + per-message cost). May start manual and switch on
+   the bot once volume justifies it.

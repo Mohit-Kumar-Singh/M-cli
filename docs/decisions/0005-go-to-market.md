@@ -41,14 +41,16 @@ lock, later slot.
 
 - **Channel: word of mouth.** Start in our own locality, seed with people we
   know, and ask every casual customer for a referral.
+- **Everyone sells** — the operator plus Aman & Manjeet all bring in customers.
 - No paid marketing, no flyers at launch.
 
 ## First-15 plan (the expansion gate)
 
-Target: **15 regular fixed customers** before scaling area/staff/price (see
-0003). Approach:
-
-- Launch to our own locality only.
+- **Launch: November 2026** (target; real trigger is the dairy producing).
+- **Area:** one locality, ~50 households in delivery reach. This is also the
+  practical ceiling for now — see 0006 (not enough milk for more).
+- **Target: 15 regular fixed customers within 1 month of launch**, before
+  scaling area/staff/price (see 0003).
 - Convert people we already know first.
 - After each casual customer has had a good week, pitch them the regular offer
   (price-lock is the hook).
@@ -63,8 +65,5 @@ Per day overall: milk taken from dairy, sold, returned to dairy.
 
 ## Open items
 
-- [ ] Which locality, and roughly how many households are in reach.
-- [ ] Launch date / trigger (tied to the dairy being ready).
-- [ ] Who does the selling — just the operator, or Aman/Manjeet help.
-- [ ] Timeframe target for hitting 15 regulars.
+- [ ] Name the specific locality.
 - [ ] Referral incentive, if any (currently none).
