@@ -55,7 +55,9 @@ Two types:
 - Herd: **8–10 buffalo → ~70–80 kg/day max**, and only if halwais are bypassed.
   Retail gets a **carve-out** of that, not all of it.
 - **50 households (~50–75 kg/day) ≈ the whole herd** — a medium-term ceiling,
-  not a launch number. Launch is really ~15–20 households / ~20–30 kg/day.
+  not a launch number (accepted). Launch is really ~15–20 households /
+  ~20–30 kg/day. Once proven, grow supply to match demand: more buffalo, or
+  vetted third-party vendors redistributed under the same quality standard.
 - Margin ₹5/kg → ~₹2,700/month gross at 15 regulars. **Net negative until
   ~40–50 kg/day.**
 - Therefore: **operator delivers themselves at launch**; paid delivery boy and
@@ -83,8 +85,10 @@ Two types:
 3. **Loss-making at launch scale.** ~₹2,700/month gross at 15 regulars won't
    cover a delivery wage. Mitigation is decided (operator delivers, price
    step-up at ~40–50 kg/day) but the plan runs thin until volume grows.
-4. **Herd size caps growth.** Can't reach 50 households without more buffalo or
-   pulling volume off the halwais — needs a conversation with the dairy.
+4. **Supply caps growth (accepted for now).** Can't exceed the herd's
+   retail carve-out until supply is expanded — more buffalo or vetted
+   third-party vendors. Grow supply just ahead of demand; vendor quality
+   vetting becomes the critical control if redistributing others' milk.
 5. **Regular-customer payment model** (prepaid vs monthly) is undecided.
 6. **Business name and legal structure** not decided (repo name "M-cli" is a
    placeholder).

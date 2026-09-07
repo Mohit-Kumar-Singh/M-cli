@@ -27,8 +27,20 @@ thin. This decision records the numbers so the plan stays honest.
 
 50 households ≈ the **entire herd's output**. It cannot coexist with the halwai
 business at the current herd size. **50 is a medium-term ceiling, not a launch
-number.** Reaching it needs more buffalo or a deliberate shift of volume away
-from the halwais — a conversation to have with Aman & Manjeet.
+number** — and that is accepted. This is an initial-phase plan: prove the
+delivery model works small, then grow supply to match demand.
+
+**Growth path for supply, once the model is proven:**
+
+1. Increase the fixed-household count gradually, staying within available milk.
+2. Expand production — add buffalo to the herd.
+3. Or source good-quality milk from **other milk vendors** and redistribute it
+   under the same brand/standard. Lets demand grow faster than the herd, as
+   long as quality (pure, unadulterated) is protected — vetting vendors becomes
+   the critical control.
+
+Sequencing: don't sign customers we can't supply; add supply just ahead of
+demand, not far behind it.
 
 ## Unit economics at launch scale
 
@@ -45,8 +57,9 @@ from the halwais — a conversation to have with Aman & Manjeet.
    later step.)
 2. The **price step-up / delivery-fee trigger** (0002) is tied to the same
    threshold: revisit pricing when daily sales reach ~40–50 kg.
-3. **Herd expansion is the real lever** for growth beyond ~50 kg/day. Flag it
-   with the dairy early; don't sign up customers we can't supply.
+3. **Grow supply to match demand** once the model is proven — more buffalo, or
+   vetted third-party vendors redistributed under the same quality standard.
+   Add supply just ahead of demand; never sign customers we can't supply.
 
 ## Open items
 
