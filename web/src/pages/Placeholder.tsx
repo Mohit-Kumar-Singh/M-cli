@@ -1,3 +1,6 @@
+import { Hammer } from "lucide-react";
+import { PageHeader, Card, Badge } from "../ui";
+
 interface Props {
   title: string;
   milestone: string;
@@ -5,22 +8,32 @@ interface Props {
   points: string[];
 }
 
-/** Stand-in for a module not yet built. Lists what 0007 says it will do. */
+/** Stand-in for a module not built yet. Lists what 0007 says it will do. */
 export default function Placeholder({ title, milestone, spec, points }: Props) {
   return (
-    <div className="space-y-3">
-      <div className="flex items-center gap-2">
-        <h1 className="text-lg font-bold">{title}</h1>
-        <span className="badge text-xs muted">{milestone}</span>
-      </div>
-      <p className="muted text-sm">
-        Not built yet. Spec: <code>{spec}</code>
-      </p>
-      <ul className="card p-4 space-y-1 text-sm list-disc list-inside">
-        {points.map((p) => (
-          <li key={p}>{p}</li>
-        ))}
-      </ul>
+    <div>
+      <PageHeader title={title} subtitle={<>Planned for {milestone.toLowerCase()}</>} />
+      <Card>
+        <div className="flex items-center gap-2 mb-3">
+          <span className="grid place-items-center h-8 w-8 rounded-full bg-gold-weak text-gold">
+            <Hammer size={16} />
+          </span>
+          <div className="text-[13px] text-ink-mute">
+            Not built yet · spec <code>{spec}</code>
+          </div>
+          <span className="ml-auto">
+            <Badge tone="gold">{milestone}</Badge>
+          </span>
+        </div>
+        <ul className="space-y-1.5 text-[13px] text-ink-soft">
+          {points.map((p) => (
+            <li key={p} className="flex gap-2">
+              <span className="text-ink-mute">—</span>
+              <span>{p}</span>
+            </li>
+          ))}
+        </ul>
+      </Card>
     </div>
   );
 }

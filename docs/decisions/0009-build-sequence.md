@@ -9,13 +9,17 @@ lands first. November 2026 is the aim for **Milestone 1**; the full feature set
 
 ## Milestone 0 — Scaffold ✅ done
 
-- `web/` — Vite + React + TS + Tailwind, app shell, routing, auth. (PWA plugin
-  still to add.)
+- `web/` — Vite + React + TS + Tailwind, app shell, routing, auth.
+- **Rebrand to Milk Garage** — design-token system, system/light/dark theme,
+  reusable UI kit, desktop-sidebar / mobile-bottom-nav layout, brand mark +
+  icons.
+- **PWA** — manifest, maskable icons, service worker (`vite-plugin-pwa`),
+  offline shell + `public/offline.html`. SW excludes Supabase traffic.
 - `supabase/` — core schema migration `0001`, RLS, roles. Project provisioned
   (`pcwelnsubcbmftksnsjf`, ap-south-1), migration applied, RLS verified by
   scoped query as owner / delivery_runner / unknown.
 - Auth + role-gated nav (owner / delivery_runner / dairy_hand).
-- ⬜ Deploy pipeline (Vercel) — not wired yet.
+- **Deploy pipeline** — Vercel (root `web/`, Vite preset, `vercel.json`).
 
 ## Milestone 1 — Usable core (target: November launch)
 

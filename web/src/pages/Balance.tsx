@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase, supabaseConfigured } from "../lib/supabase";
-import { isoDate, addDays, prettyDate } from "../lib/dates";
+import { isoDate } from "../lib/dates";
 import type { RetailOrder, WholesaleDelivery, MilkProduction } from "../types/db";
+import { PageHeader, Button, Card, Field, Input, DateStepper, Skeleton } from "../ui";
 
 interface Computed {
   produced: number;
@@ -11,7 +12,6 @@ interface Computed {
   upi: number;
   unpaid: number;
 }
-
 const ZERO: Computed = { produced: 0, wholesale: 0, retail: 0, cash: 0, upi: 0, unpaid: 0 };
 
 export default function Balance() {
@@ -87,7 +87,7 @@ export default function Balance() {
   }, [load]);
 
   const n = (s: string) => parseFloat(s) || 0;
-  const bufferDelta = n(bufEnd) - n(bufStart); // +ve = milk added to fridge
+  const bufferDelta = n(bufEnd) - n(bufStart);
   const accounted = c.wholesale + c.retail + n(ownUse) + n(wastage) + bufferDelta;
   const unaccounted = c.produced - accounted;
 
@@ -110,92 +110,118 @@ export default function Balance() {
       notes: notes.trim() || null,
     });
     setSaving(false);
-    setMsg(error ? error.message : "Saved.");
+    setMsg(error ? error.message : "Saved");
   }
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-lg font-bold">Daily milk balance</h1>
+    <div>
+      <PageHeader title="Daily milk balance" subtitle="Where the day's milk and money went." />
 
-      {!supabaseConfigured && (
-        <p className="card p-4 text-sm" style={{ color: "var(--danger)" }}>
-          Connect Supabase to reconcile the day.
-        </p>
-      )}
-
-      <div className="card p-3 flex items-center gap-3">
-        <button className="text-sm muted" onClick={() => setDate(addDays(date, -1))}>‹</button>
-        <input className="input w-auto" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
-        <button className="text-sm muted" onClick={() => setDate(addDays(date, 1))} disabled={date >= isoDate()}>›</button>
-        <span className="muted text-sm ml-auto">{prettyDate(date)}</span>
-      </div>
+      <DateStepper value={date} onChange={setDate} max={isoDate()} className="mb-4" />
 
       {loading ? (
-        <p className="muted text-sm">Loading…</p>
+        <div className="space-y-3">
+          <Skeleton h={90} className="rounded-[14px]" />
+          <Skeleton h={190} className="rounded-[14px]" />
+          <Skeleton h={130} className="rounded-[14px]" />
+        </div>
       ) : (
-        <>
-          <div className="card p-3 text-sm grid grid-cols-2 gap-y-1">
-            <span className="muted">Produced</span>
-            <b className="text-right">{c.produced.toFixed(2)} kg</b>
-            <span className="muted">To wholesale</span>
-            <b className="text-right">{c.wholesale.toFixed(2)} kg</b>
-            <span className="muted">To retail (delivered)</span>
-            <b className="text-right">{c.retail.toFixed(2)} kg</b>
-          </div>
-
-          <div className="card p-4 space-y-3">
-            <div className="grid grid-cols-2 gap-3">
-              <label className="text-sm">
-                Own use (kg)
-                <input className="input mt-1" inputMode="decimal" value={ownUse} onChange={(e) => setOwnUse(e.target.value)} />
-              </label>
-              <label className="text-sm">
-                Wastage (kg)
-                <input className="input mt-1" inputMode="decimal" value={wastage} onChange={(e) => setWastage(e.target.value)} />
-              </label>
-              <label className="text-sm">
-                Buffer start (kg)
-                <input className="input mt-1" inputMode="decimal" value={bufStart} onChange={(e) => setBufStart(e.target.value)} />
-              </label>
-              <label className="text-sm">
-                Buffer end (kg)
-                <input className="input mt-1" inputMode="decimal" value={bufEnd} onChange={(e) => setBufEnd(e.target.value)} />
-              </label>
+        <div className="space-y-3">
+          <Card>
+            <div className="grid grid-cols-3 gap-3 text-center">
+              <Metric k="Produced" v={`${c.produced.toFixed(1)}`} unit="kg" />
+              <Metric k="To wholesale" v={`${c.wholesale.toFixed(1)}`} unit="kg" />
+              <Metric k="To retail" v={`${c.retail.toFixed(1)}`} unit="kg" />
             </div>
-            <label className="text-sm block">
-              Notes
-              <input className="input mt-1" value={notes} onChange={(e) => setNotes(e.target.value)} />
-            </label>
-          </div>
+          </Card>
 
-          <div className="card p-3 text-sm grid grid-cols-2 gap-y-1">
-            <span className="muted">Accounted for</span>
-            <b className="text-right">{accounted.toFixed(2)} kg</b>
-            <span className="muted">Unaccounted (produced − accounted)</span>
-            <b
-              className="text-right"
-              style={{ color: Math.abs(unaccounted) > 0.5 ? "var(--danger)" : "var(--ok)" }}
-            >
-              {unaccounted.toFixed(2)} kg
-            </b>
-            <span className="muted">Cash collected</span>
-            <b className="text-right">₹{c.cash.toFixed(0)}</b>
-            <span className="muted">UPI collected</span>
-            <b className="text-right">₹{c.upi.toFixed(0)}</b>
-            <span className="muted">Unpaid</span>
-            <b className="text-right" style={{ color: c.unpaid ? "var(--danger)" : undefined }}>
-              ₹{c.unpaid.toFixed(0)}
-            </b>
-          </div>
+          <Card>
+            <div className="grid grid-cols-2 gap-3">
+              <Field label="Own use (kg)">
+                {(id) => (
+                  <Input id={id} inputMode="decimal" value={ownUse} onChange={(e) => setOwnUse(e.target.value)} />
+                )}
+              </Field>
+              <Field label="Wastage (kg)">
+                {(id) => (
+                  <Input id={id} inputMode="decimal" value={wastage} onChange={(e) => setWastage(e.target.value)} />
+                )}
+              </Field>
+              <Field label="Buffer start (kg)">
+                {(id) => (
+                  <Input id={id} inputMode="decimal" value={bufStart} onChange={(e) => setBufStart(e.target.value)} />
+                )}
+              </Field>
+              <Field label="Buffer end (kg)">
+                {(id) => (
+                  <Input id={id} inputMode="decimal" value={bufEnd} onChange={(e) => setBufEnd(e.target.value)} />
+                )}
+              </Field>
+              <Field label="Notes" className="col-span-2">
+                {(id) => (
+                  <Input id={id} value={notes} onChange={(e) => setNotes(e.target.value)} />
+                )}
+              </Field>
+            </div>
+          </Card>
 
-          <div className="flex items-center justify-between">
-            {msg && <span className="text-sm muted">{msg}</span>}
-            <button className="btn-primary ml-auto" onClick={save} disabled={saving || !supabaseConfigured}>
-              {saving ? "Saving…" : "Save balance"}
-            </button>
+          <Card>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-[13px]">
+              <Line k="Accounted for" v={`${accounted.toFixed(2)} kg`} />
+              <Line
+                k="Unaccounted"
+                v={`${unaccounted.toFixed(2)} kg`}
+                tone={Math.abs(unaccounted) > 0.5 ? "danger" : "success"}
+              />
+              <Line k="Cash collected" v={`₹${c.cash.toFixed(0)}`} />
+              <Line k="UPI collected" v={`₹${c.upi.toFixed(0)}`} />
+              <Line k="Unpaid" v={`₹${c.unpaid.toFixed(0)}`} tone={c.unpaid ? "danger" : undefined} />
+            </div>
+          </Card>
+
+          <div className="flex items-center justify-end gap-3">
+            {msg && <span className="text-[13px] text-ink-mute">{msg}</span>}
+            <Button onClick={save} loading={saving} disabled={!supabaseConfigured}>
+              Save balance
+            </Button>
           </div>
-        </>
+        </div>
       )}
+    </div>
+  );
+}
+
+function Metric({ k, v, unit }: { k: string; v: string; unit: string }) {
+  return (
+    <div>
+      <div className="font-display text-[1.4rem] font-bold text-ink tnum leading-none">
+        {v}
+        <span className="text-[0.8rem] text-ink-mute font-sans font-medium"> {unit}</span>
+      </div>
+      <div className="text-[12px] text-ink-mute mt-1">{k}</div>
+    </div>
+  );
+}
+
+function Line({
+  k,
+  v,
+  tone,
+}: {
+  k: string;
+  v: string;
+  tone?: "danger" | "success";
+}) {
+  return (
+    <div className="flex justify-between">
+      <span className="text-ink-mute">{k}</span>
+      <span
+        className={`font-semibold tnum ${
+          tone === "danger" ? "text-danger" : tone === "success" ? "text-success" : "text-ink"
+        }`}
+      >
+        {v}
+      </span>
     </div>
   );
 }

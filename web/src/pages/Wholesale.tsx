@@ -1,7 +1,20 @@
 import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { Plus, Store } from "lucide-react";
 import { supabase, supabaseConfigured } from "../lib/supabase";
 import { isoDate, prettyDate } from "../lib/dates";
 import type { WholesaleCustomer, WholesaleDelivery } from "../types/db";
+import {
+  PageHeader,
+  Button,
+  Card,
+  ListCard,
+  Field,
+  Input,
+  Select,
+  Badge,
+  EmptyState,
+  SkeletonList,
+} from "../ui";
 
 export default function Wholesale() {
   const [customers, setCustomers] = useState<WholesaleCustomer[]>([]);
@@ -36,105 +49,109 @@ export default function Wholesale() {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-lg font-bold">Wholesale</h1>
-        <button className="btn-primary" onClick={() => setShowCust((v) => !v)}>
-          {showCust ? "Close" : "Add customer"}
-        </button>
-      </div>
-
-      {!supabaseConfigured && (
-        <p className="card p-4 text-sm" style={{ color: "var(--danger)" }}>
-          Connect Supabase to manage wholesale.
-        </p>
-      )}
+    <div>
+      <PageHeader
+        title="Wholesale"
+        subtitle="Bulk supply to sweet shops, and what they owe."
+        actions={
+          <Button size="sm" icon={<Plus size={16} />} onClick={() => setShowCust((v) => !v)}>
+            {showCust ? "Close" : "Add customer"}
+          </Button>
+        }
+      />
 
       {showCust && (
-        <CustomerForm
-          onSaved={() => {
-            setShowCust(false);
-            void load();
-          }}
-        />
+        <div className="mb-4">
+          <CustomerForm
+            onSaved={() => {
+              setShowCust(false);
+              void load();
+            }}
+          />
+        </div>
       )}
 
       {loading ? (
-        <p className="muted text-sm">Loading…</p>
+        <SkeletonList rows={4} />
       ) : (
-        <>
-          <section className="space-y-2">
-            <h2 className="text-sm font-bold muted">Customers &amp; dues</h2>
-            {customers.length === 0 && (
-              <p className="muted text-sm">No wholesale customers yet.</p>
-            )}
-            {customers.map((c) => {
-              const due = outstanding(c.id);
-              return (
-                <div key={c.id} className="card p-3 flex items-center justify-between">
-                  <div>
-                    <div className="font-medium">
-                      {c.name}{" "}
-                      <span className="muted text-xs">{c.shop ?? ""}</span>
+        <div className="space-y-5">
+          <section>
+            <h2 className="text-[13px] font-semibold text-ink-mute mb-2">Customers &amp; dues</h2>
+            {customers.length === 0 ? (
+              <EmptyState
+                icon={<Store size={18} />}
+                title="No wholesale customers"
+                description="Add each halwai with their agreed rate, then record daily dispatches below."
+              />
+            ) : (
+              <ListCard>
+                {customers.map((c) => {
+                  const due = outstanding(c.id);
+                  return (
+                    <div key={c.id} className="flex items-center justify-between gap-3 p-3.5">
+                      <div className="min-w-0">
+                        <div className="font-medium text-ink truncate">
+                          {c.name}
+                          {c.shop ? <span className="text-ink-mute"> · {c.shop}</span> : null}
+                        </div>
+                        <div className="text-[12px] text-ink-mute tnum">₹{c.rate_per_kg}/kg</div>
+                      </div>
+                      <Badge tone={due > 0 ? "danger" : "success"}>
+                        {due > 0 ? `₹${due.toFixed(0)} due` : "clear"}
+                      </Badge>
                     </div>
-                    <div className="muted text-xs">₹{c.rate_per_kg}/kg</div>
-                  </div>
-                  <div
-                    className="text-sm font-bold"
-                    style={{ color: due > 0 ? "var(--danger)" : "var(--ok)" }}
-                  >
-                    {due > 0 ? `₹${due.toFixed(0)} due` : "clear"}
-                  </div>
-                </div>
-              );
-            })}
+                  );
+                })}
+              </ListCard>
+            )}
           </section>
 
           <DispatchForm
             customers={customers}
             onSaved={() => {
-              setMsg("Dispatch recorded.");
+              setMsg("Dispatch recorded");
               void load();
             }}
           />
-          {msg && <p className="text-sm muted">{msg}</p>}
+          {msg && <p className="text-[13px] text-ink-mute">{msg}</p>}
 
-          <section className="space-y-2">
-            <h2 className="text-sm font-bold muted">Recent dispatches</h2>
-            {deliveries.length === 0 && (
-              <p className="muted text-sm">Nothing yet.</p>
-            )}
-            {deliveries.map((d) => {
-              const cust = customers.find((c) => c.id === d.customer_id);
-              return (
-                <div key={d.id} className="card p-3 flex items-center justify-between text-sm">
-                  <div>
-                    <div className="font-medium">{cust?.name ?? "—"}</div>
-                    <div className="muted text-xs">
-                      {prettyDate(d.date)} · {d.qty_kg} kg @ ₹{d.rate_per_kg}
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div>₹{Number(d.amount).toFixed(0)}</div>
+          <section>
+            <h2 className="text-[13px] font-semibold text-ink-mute mb-2">Recent dispatches</h2>
+            {deliveries.length === 0 ? (
+              <p className="text-[13px] text-ink-mute">Nothing recorded yet.</p>
+            ) : (
+              <ListCard>
+                {deliveries.map((d) => {
+                  const cust = customers.find((c) => c.id === d.customer_id);
+                  const paid = Number(d.amount_received ?? 0) >= Number(d.amount);
+                  return (
                     <div
-                      className="text-xs"
-                      style={{
-                        color:
-                          Number(d.amount_received ?? 0) >= Number(d.amount)
-                            ? "var(--ok)"
-                            : "var(--danger)",
-                      }}
+                      key={d.id}
+                      className="flex items-center justify-between gap-3 p-3.5 text-[13px]"
                     >
-                      {Number(d.amount_received ?? 0) >= Number(d.amount)
-                        ? "paid"
-                        : `₹${(Number(d.amount) - Number(d.amount_received ?? 0)).toFixed(0)} due`}
+                      <div className="min-w-0">
+                        <div className="font-medium text-ink truncate">{cust?.name ?? "—"}</div>
+                        <div className="text-[12px] text-ink-mute tnum">
+                          {prettyDate(d.date)} · {d.qty_kg} kg @ ₹{d.rate_per_kg}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="tnum text-ink">₹{Number(d.amount).toFixed(0)}</div>
+                        <div
+                          className={`text-[12px] ${paid ? "text-success" : "text-danger"}`}
+                        >
+                          {paid
+                            ? "paid"
+                            : `₹${(Number(d.amount) - Number(d.amount_received ?? 0)).toFixed(0)} due`}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              );
-            })}
+                  );
+                })}
+              </ListCard>
+            )}
           </section>
-        </>
+        </div>
       )}
     </div>
   );
@@ -164,30 +181,36 @@ function CustomerForm({ onSaved }: { onSaved: () => void }) {
   }
 
   return (
-    <form onSubmit={submit} className="card p-4 space-y-3">
-      <div className="grid grid-cols-2 gap-3">
-        <label className="text-sm">
-          Name
-          <input className="input mt-1" value={name} onChange={(e) => setName(e.target.value)} required />
-        </label>
-        <label className="text-sm">
-          Shop
-          <input className="input mt-1" value={shop} onChange={(e) => setShop(e.target.value)} />
-        </label>
-        <label className="text-sm">
-          Phone
-          <input className="input mt-1" value={phone} onChange={(e) => setPhone(e.target.value)} />
-        </label>
-        <label className="text-sm">
-          ₹/kg
-          <input className="input mt-1" inputMode="decimal" value={rate} onChange={(e) => setRate(e.target.value)} required />
-        </label>
-      </div>
-      {error && <p className="text-sm" style={{ color: "var(--danger)" }}>{error}</p>}
-      <button className="btn-primary" disabled={busy}>
-        {busy ? "Saving…" : "Save customer"}
-      </button>
-    </form>
+    <Card>
+      <form onSubmit={submit} className="space-y-3">
+        <div className="grid grid-cols-2 gap-3">
+          <Field label="Name">
+            {(id) => <Input id={id} value={name} onChange={(e) => setName(e.target.value)} required />}
+          </Field>
+          <Field label="Shop">
+            {(id) => <Input id={id} value={shop} onChange={(e) => setShop(e.target.value)} />}
+          </Field>
+          <Field label="Phone">
+            {(id) => <Input id={id} value={phone} onChange={(e) => setPhone(e.target.value)} />}
+          </Field>
+          <Field label="₹ / kg">
+            {(id) => (
+              <Input
+                id={id}
+                inputMode="decimal"
+                value={rate}
+                onChange={(e) => setRate(e.target.value)}
+                required
+              />
+            )}
+          </Field>
+        </div>
+        {error && <p className="text-[13px] text-danger">{error}</p>}
+        <Button type="submit" loading={busy}>
+          Save customer
+        </Button>
+      </form>
+    </Card>
   );
 }
 
@@ -241,50 +264,81 @@ function DispatchForm({
   }
 
   return (
-    <form onSubmit={submit} className="card p-4 space-y-3">
-      <h2 className="text-sm font-bold muted">Record dispatch</h2>
-      <div className="grid grid-cols-2 gap-3">
-        <label className="text-sm">
-          Date
-          <input className="input mt-1" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
-        </label>
-        <label className="text-sm">
-          Customer
-          <select className="input mt-1" value={customerId} onChange={(e) => pickCustomer(e.target.value)} required>
-            <option value="">—</option>
-            {customers.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="text-sm">
-          Qty (kg)
-          <input className="input mt-1" inputMode="decimal" value={qty} onChange={(e) => setQty(e.target.value)} required />
-        </label>
-        <label className="text-sm">
-          ₹/kg
-          <input className="input mt-1" inputMode="decimal" value={rate} onChange={(e) => setRate(e.target.value)} required />
-        </label>
-        <label className="text-sm">
-          Received ₹
-          <input className="input mt-1" inputMode="decimal" value={received} onChange={(e) => setReceived(e.target.value)} />
-        </label>
-        <label className="text-sm">
-          Method
-          <select className="input mt-1" value={method} onChange={(e) => setMethod(e.target.value as "upi" | "cash" | "none")}>
-            <option value="none">—</option>
-            <option value="upi">UPI</option>
-            <option value="cash">cash</option>
-          </select>
-        </label>
-      </div>
-      <p className="muted text-sm">Amount: <b>₹{amount.toFixed(0)}</b></p>
-      {error && <p className="text-sm" style={{ color: "var(--danger)" }}>{error}</p>}
-      <button className="btn-primary" disabled={busy}>
-        {busy ? "Saving…" : "Record dispatch"}
-      </button>
-    </form>
+    <Card>
+      <form onSubmit={submit} className="space-y-3">
+        <h2 className="font-display font-bold text-ink">Record dispatch</h2>
+        <div className="grid grid-cols-2 gap-3">
+          <Field label="Date">
+            {(id) => (
+              <Input id={id} type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+            )}
+          </Field>
+          <Field label="Customer">
+            {(id) => (
+              <Select id={id} value={customerId} onChange={(e) => pickCustomer(e.target.value)} required>
+                <option value="">Select…</option>
+                {customers.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </Select>
+            )}
+          </Field>
+          <Field label="Quantity (kg)">
+            {(id) => (
+              <Input
+                id={id}
+                inputMode="decimal"
+                value={qty}
+                onChange={(e) => setQty(e.target.value)}
+                required
+              />
+            )}
+          </Field>
+          <Field label="₹ / kg">
+            {(id) => (
+              <Input
+                id={id}
+                inputMode="decimal"
+                value={rate}
+                onChange={(e) => setRate(e.target.value)}
+                required
+              />
+            )}
+          </Field>
+          <Field label="Received ₹">
+            {(id) => (
+              <Input
+                id={id}
+                inputMode="decimal"
+                value={received}
+                onChange={(e) => setReceived(e.target.value)}
+              />
+            )}
+          </Field>
+          <Field label="Method">
+            {(id) => (
+              <Select
+                id={id}
+                value={method}
+                onChange={(e) => setMethod(e.target.value as "upi" | "cash" | "none")}
+              >
+                <option value="none">—</option>
+                <option value="upi">UPI</option>
+                <option value="cash">Cash</option>
+              </Select>
+            )}
+          </Field>
+        </div>
+        <p className="text-[13px] text-ink-mute">
+          Amount <span className="font-semibold text-ink tnum">₹{amount.toFixed(0)}</span>
+        </p>
+        {error && <p className="text-[13px] text-danger">{error}</p>}
+        <Button type="submit" loading={busy}>
+          Record dispatch
+        </Button>
+      </form>
+    </Card>
   );
 }

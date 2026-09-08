@@ -17,7 +17,8 @@ if (!supabaseConfigured) {
 // Untyped client for now. Once the Supabase project exists, generate types:
 //   npx supabase gen types typescript --linked > src/types/db.ts
 // and switch to createClient<Database>(...).
+// The placeholder URL is never contacted — screens guard on `supabaseConfigured`.
 export const supabase = createClient(
-  url ?? "http://localhost:54321",
-  anonKey ?? "public-anon-key-placeholder",
+  url ?? "https://unconfigured.invalid",
+  anonKey ?? "unconfigured",
 );

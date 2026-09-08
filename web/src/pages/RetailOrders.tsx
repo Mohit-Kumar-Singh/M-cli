@@ -1,12 +1,19 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { ClipboardList, Lock, Plus } from "lucide-react";
 import { supabase, supabaseConfigured } from "../lib/supabase";
-import {
-  addDays,
-  isPastCutoffFor,
-  nextDeliveryDate,
-  prettyDate,
-} from "../lib/dates";
+import { isPastCutoffFor, nextDeliveryDate } from "../lib/dates";
 import type { RetailCustomer, RetailOrder } from "../types/db";
+import {
+  PageHeader,
+  Button,
+  Card,
+  ListCard,
+  Input,
+  Badge,
+  DateStepper,
+  EmptyState,
+  SkeletonList,
+} from "../ui";
 
 interface Line {
   customer: RetailCustomer;
@@ -41,7 +48,9 @@ export default function RetailOrders() {
     ]);
     const customers = (custRes.data ?? []) as RetailCustomer[];
     const orders = (orderRes.data ?? []) as RetailOrder[];
-    const pausedIds = new Set((pauseRes.data ?? []).map((p: { customer_id: string }) => p.customer_id));
+    const pausedIds = new Set(
+      (pauseRes.data ?? []).map((p: { customer_id: string }) => p.customer_id),
+    );
     const orderByCust = new Map(orders.map((o) => [o.customer_id, o]));
 
     const regulars = customers
@@ -66,7 +75,6 @@ export default function RetailOrders() {
       };
     });
 
-    // Casual customers who already have an order for this date.
     const casualLines: Line[] = customers
       .filter((c) => c.type === "casual" && orderByCust.has(c.id))
       .map((c) => {
@@ -81,11 +89,7 @@ export default function RetailOrders() {
       });
 
     setLines([...regularLines, ...casualLines]);
-    setCasuals(
-      customers.filter(
-        (c) => c.type === "casual" && !orderByCust.has(c.id),
-      ),
-    );
+    setCasuals(customers.filter((c) => c.type === "casual" && !orderByCust.has(c.id)));
     setLoading(false);
   }, [date]);
 
@@ -97,18 +101,14 @@ export default function RetailOrders() {
     () => lines.reduce((s, l) => s + (parseFloat(l.qty) || 0), 0),
     [lines],
   );
+  const stops = lines.filter((l) => parseFloat(l.qty) > 0).length;
 
   function setQty(customerId: string, qty: string) {
-    setLines((ls) =>
-      ls.map((l) => (l.customer.id === customerId ? { ...l, qty } : l)),
-    );
+    setLines((ls) => ls.map((l) => (l.customer.id === customerId ? { ...l, qty } : l)));
   }
 
   function addCasual(c: RetailCustomer) {
-    setLines((ls) => [
-      ...ls,
-      { customer: c, qty: "", source: "manual", paused: false },
-    ]);
+    setLines((ls) => [...ls, { customer: c, qty: "", source: "manual", paused: false }]);
     setCasuals((cs) => cs.filter((x) => x.id !== c.id));
   }
 
@@ -131,11 +131,7 @@ export default function RetailOrders() {
       .map((l) => l.orderId!) as string[];
 
     if (toDelete.length) {
-      await supabase
-        .from("retail_orders")
-        .delete()
-        .in("id", toDelete)
-        .eq("status", "pending");
+      await supabase.from("retail_orders").delete().in("id", toDelete).eq("status", "pending");
     }
     const { error } = toUpsert.length
       ? await supabase
@@ -146,109 +142,97 @@ export default function RetailOrders() {
     setSaving(false);
     if (error) setMsg(error.message);
     else {
-      setMsg("Saved.");
+      setMsg("Saved");
       void load();
     }
   }
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-lg font-bold">Orders for a day</h1>
+    <div>
+      <PageHeader
+        title="Orders for a day"
+        subtitle="Regulars are filled in from their standing quantity. Add casual orders on top."
+      />
 
-      {!supabaseConfigured && (
-        <p className="card p-4 text-sm" style={{ color: "var(--danger)" }}>
-          Connect Supabase to build the order list.
-        </p>
-      )}
-
-      <div className="card p-3 flex items-center gap-3">
-        <button className="text-sm muted" onClick={() => setDate(addDays(date, -1))}>
-          ‹
-        </button>
-        <input
-          className="input w-auto"
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-        />
-        <button className="text-sm muted" onClick={() => setDate(addDays(date, 1))}>
-          ›
-        </button>
-        <span className="muted text-sm ml-auto">{prettyDate(date)}</span>
-      </div>
+      <DateStepper value={date} onChange={setDate} className="mb-4" />
 
       {frozen && (
-        <p className="card p-3 text-sm" style={{ color: "var(--danger)" }}>
-          Past the 9 pm cutoff for this date — the list is frozen. New orders go
-          to a later date (0003).
-        </p>
+        <Card className="mb-4 !bg-gold-weak !border-transparent">
+          <p className="flex items-start gap-2 text-[13px] text-gold">
+            <Lock size={15} className="mt-0.5 shrink-0" />
+            Past the 9&nbsp;pm cutoff for this date — the list is frozen. New
+            orders roll to a later date (decision 0003).
+          </p>
+        </Card>
       )}
 
       {loading ? (
-        <p className="muted text-sm">Loading…</p>
+        <SkeletonList rows={5} />
+      ) : lines.length === 0 ? (
+        <EmptyState
+          icon={<ClipboardList size={18} />}
+          title="Nothing scheduled"
+          description="No regulars with a standing quantity, and no casual orders for this date yet."
+        />
       ) : (
-        <div className="card divide-y" style={{ borderColor: "var(--border)" }}>
-          {lines.length === 0 && (
-            <p className="p-3 muted text-sm">No orders yet for this date.</p>
-          )}
+        <ListCard>
           {lines.map((l) => (
-            <div key={l.customer.id} className="flex items-center gap-3 p-3">
-              <div className="flex-1">
-                <div className="font-medium">
-                  {l.customer.name}{" "}
-                  <span className="muted text-xs">
-                    {l.customer.type === "regular" ? "regular" : "casual"}
-                    {l.paused ? " · paused" : ""}
-                  </span>
+            <div key={l.customer.id} className="flex items-center gap-3 p-3.5">
+              <div className="flex-1 min-w-0">
+                <div className="font-medium text-ink truncate">{l.customer.name}</div>
+                <div className="text-[12px] text-ink-mute flex items-center gap-1.5">
+                  <Badge tone={l.customer.type === "regular" ? "accent" : "neutral"}>
+                    {l.customer.type}
+                  </Badge>
+                  {l.paused && <Badge tone="gold">paused</Badge>}
+                  {l.customer.area && <span>{l.customer.area}</span>}
                 </div>
-                <div className="muted text-xs">{l.customer.area ?? ""}</div>
               </div>
-              <input
-                className="input w-24 text-right"
+              <Input
                 inputMode="decimal"
                 placeholder="kg"
+                className="w-24 text-right tnum"
                 value={l.qty}
                 disabled={frozen}
                 onChange={(e) => setQty(l.customer.id, e.target.value)}
               />
             </div>
           ))}
-        </div>
+        </ListCard>
       )}
 
       {!frozen && casuals.length > 0 && (
-        <div className="card p-3">
-          <div className="muted text-xs mb-2">Add a casual order</div>
+        <Card className="mt-3">
+          <div className="text-[12px] font-medium text-ink-mute mb-2">Add a casual order</div>
           <div className="flex flex-wrap gap-2">
             {casuals.map((c) => (
               <button
                 key={c.id}
-                className="rounded-lg border px-2.5 py-1 text-sm"
-                style={{ borderColor: "var(--border)" }}
                 onClick={() => addCasual(c)}
+                className="inline-flex items-center gap-1 rounded-full border border-[var(--border-strong)] px-2.5 py-1 text-[13px] text-ink-soft hover:bg-sunken transition-colors"
               >
-                + {c.name}
+                <Plus size={13} />
+                {c.name}
               </button>
             ))}
           </div>
-        </div>
+        </Card>
       )}
 
-      <div className="flex items-center justify-between">
-        <div className="text-sm">
-          <span className="muted">Total: </span>
-          <span className="font-bold">{total.toFixed(2)} kg</span>
-          <span className="muted"> · {lines.filter((l) => parseFloat(l.qty) > 0).length} stops</span>
-        </div>
-        <button
-          className="btn-primary"
-          onClick={save}
-          disabled={saving || frozen || !supabaseConfigured}
-        >
-          {saving ? "Saving…" : "Save orders"}
-        </button>
-      </div>
-      {msg && <p className="text-sm muted">{msg}</p>}
+      {!loading && (
+        <Card className="mt-3 flex items-center justify-between gap-3">
+          <div className="text-[13px]">
+            <span className="font-bold text-ink tnum">{total.toFixed(2)} kg</span>
+            <span className="text-ink-mute"> · {stops} stops</span>
+          </div>
+          <div className="flex items-center gap-3">
+            {msg && <span className="text-[13px] text-ink-mute">{msg}</span>}
+            <Button onClick={save} loading={saving} disabled={frozen || !supabaseConfigured}>
+              Save orders
+            </Button>
+          </div>
+        </Card>
+      )}
     </div>
   );
 }

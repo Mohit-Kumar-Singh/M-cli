@@ -1,7 +1,19 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { Truck, Check } from "lucide-react";
 import { supabase, supabaseConfigured } from "../lib/supabase";
-import { isoDate, addDays, prettyDate } from "../lib/dates";
+import { isoDate } from "../lib/dates";
 import type { RetailCustomer, RetailOrder } from "../types/db";
+import {
+  PageHeader,
+  Button,
+  Card,
+  Input,
+  Select,
+  Badge,
+  DateStepper,
+  EmptyState,
+  SkeletonList,
+} from "../ui";
 
 interface Row extends RetailOrder {
   customer?: RetailCustomer;
@@ -60,53 +72,31 @@ export default function Deliveries() {
     return { deliveredKg, cash, upi, unpaid, done };
   }, [rows]);
 
-  async function mark(
-    r: Row,
-    patch: Partial<RetailOrder>,
-  ) {
+  async function mark(r: Row, patch: Partial<RetailOrder>) {
     setBusyId(r.id);
     setMsg(null);
-    const { error } = await supabase
-      .from("retail_orders")
-      .update(patch)
-      .eq("id", r.id);
+    const { error } = await supabase.from("retail_orders").update(patch).eq("id", r.id);
     setBusyId(null);
     if (error) setMsg(error.message);
     else void load();
   }
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-lg font-bold">Delivery list</h1>
+    <div>
+      <PageHeader title="Delivery list" subtitle="Regulars first. Mark each stop as you go." />
 
-      {!supabaseConfigured && (
-        <p className="card p-4 text-sm" style={{ color: "var(--danger)" }}>
-          Connect Supabase to load the round.
-        </p>
-      )}
-
-      <div className="card p-3 flex items-center gap-3">
-        <button className="text-sm muted" onClick={() => setDate(addDays(date, -1))}>
-          ‹
-        </button>
-        <input
-          className="input w-auto"
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-        />
-        <button className="text-sm muted" onClick={() => setDate(addDays(date, 1))}>
-          ›
-        </button>
-        <span className="muted text-sm ml-auto">{prettyDate(date)}</span>
-      </div>
+      <DateStepper value={date} onChange={setDate} className="mb-4" />
 
       {loading ? (
-        <p className="muted text-sm">Loading…</p>
+        <SkeletonList rows={5} />
       ) : rows.length === 0 ? (
-        <p className="muted text-sm">No orders for this date.</p>
+        <EmptyState
+          icon={<Truck size={18} />}
+          title="No stops for this date"
+          description="Build the list on the Orders screen, then come back here to run the round."
+        />
       ) : (
-        <ul className="space-y-2">
+        <div className="space-y-2.5">
           {rows.map((r) => (
             <DeliveryRow
               key={r.id}
@@ -115,17 +105,34 @@ export default function Deliveries() {
               onMark={(patch) => void mark(r, patch)}
             />
           ))}
-        </ul>
+        </div>
       )}
 
-      <div className="card p-3 text-sm grid grid-cols-2 gap-1">
-        <div><span className="muted">Stops done: </span><b>{totals.done}/{rows.length}</b></div>
-        <div><span className="muted">Delivered: </span><b>{totals.deliveredKg.toFixed(2)} kg</b></div>
-        <div><span className="muted">Cash: </span><b>₹{totals.cash.toFixed(0)}</b></div>
-        <div><span className="muted">UPI: </span><b>₹{totals.upi.toFixed(0)}</b></div>
-        <div><span className="muted">Unpaid: </span><b style={{ color: totals.unpaid ? "var(--danger)" : undefined }}>₹{totals.unpaid.toFixed(0)}</b></div>
-      </div>
-      {msg && <p className="text-sm" style={{ color: "var(--danger)" }}>{msg}</p>}
+      {!loading && rows.length > 0 && (
+        <Card className="mt-3">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-[13px]">
+            <Row k="Stops done" v={`${totals.done} / ${rows.length}`} />
+            <Row k="Delivered" v={`${totals.deliveredKg.toFixed(2)} kg`} />
+            <Row k="Cash" v={`₹${totals.cash.toFixed(0)}`} />
+            <Row k="UPI" v={`₹${totals.upi.toFixed(0)}`} />
+            <Row
+              k="Unpaid"
+              v={`₹${totals.unpaid.toFixed(0)}`}
+              danger={totals.unpaid > 0}
+            />
+          </div>
+        </Card>
+      )}
+      {msg && <p className="text-[13px] text-danger mt-3">{msg}</p>}
+    </div>
+  );
+}
+
+function Row({ k, v, danger }: { k: string; v: string; danger?: boolean }) {
+  return (
+    <div className="flex justify-between">
+      <span className="text-ink-mute">{k}</span>
+      <span className={`font-semibold tnum ${danger ? "text-danger" : "text-ink"}`}>{v}</span>
     </div>
   );
 }
@@ -153,43 +160,56 @@ function DeliveryRow({
   const skipped = row.status === "skipped";
 
   return (
-    <li className="card p-3 space-y-2" style={done ? { opacity: 0.7 } : undefined}>
-      <div className="flex items-start justify-between">
-        <div>
-          <div className="font-medium">
-            {row.customer?.name ?? "—"}{" "}
-            <span className="muted text-xs">{row.customer?.area ?? ""}</span>
+    <div
+      className={`mg-card p-3.5 transition-opacity ${done || skipped ? "opacity-70" : ""}`}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <div className="font-medium text-ink truncate">
+            {row.customer?.name ?? "—"}
+            {row.customer?.area ? (
+              <span className="text-ink-mute"> · {row.customer.area}</span>
+            ) : null}
           </div>
-          <div className="muted text-xs">{row.customer?.address_text ?? ""}</div>
+          {row.customer?.address_text && (
+            <div className="text-[12px] text-ink-mute truncate">{row.customer.address_text}</div>
+          )}
         </div>
-        <div className="text-right text-sm">
-          <div>{row.ordered_qty_kg} kg ordered</div>
-          <div className="muted text-xs">
-            {done ? "delivered" : skipped ? "skipped" : "pending"}
-          </div>
+        <div className="text-right shrink-0">
+          <div className="text-[13px] tnum text-ink-soft">{row.ordered_qty_kg} kg</div>
+          {done ? (
+            <Badge tone={row.paid ? "success" : "danger"}>
+              {row.paid ? row.payment_method.toUpperCase() : "unpaid"}
+            </Badge>
+          ) : skipped ? (
+            <Badge tone="neutral">skipped</Badge>
+          ) : (
+            <Badge tone="neutral">pending</Badge>
+          )}
         </div>
       </div>
 
       {!done && !skipped && (
-        <div className="flex flex-wrap items-center gap-2">
-          <input
-            className="input w-20 text-right"
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <Input
             inputMode="decimal"
+            className="w-20 text-right tnum"
             value={qty}
             onChange={(e) => setQty(e.target.value)}
           />
-          <span className="muted text-xs">kg · ₹{due.toFixed(0)}</span>
-          <select
-            className="input w-auto"
+          <span className="text-[12px] text-ink-mute tnum">kg · ₹{due.toFixed(0)}</span>
+          <Select
+            className="w-auto"
             value={method}
             onChange={(e) => setMethod(e.target.value as "upi" | "cash")}
           >
             <option value="upi">UPI</option>
-            <option value="cash">cash</option>
-          </select>
-          <button
-            className="btn-primary"
-            disabled={busy}
+            <option value="cash">Cash</option>
+          </Select>
+          <Button
+            size="sm"
+            icon={<Check size={15} />}
+            loading={busy}
             onClick={() =>
               onMark({
                 status: "delivered",
@@ -201,10 +221,11 @@ function DeliveryRow({
               })
             }
           >
-            Delivered + paid
-          </button>
-          <button
-            className="text-sm muted underline"
+            Delivered
+          </Button>
+          <Button
+            size="sm"
+            variant="ghost"
             disabled={busy}
             onClick={() =>
               onMark({
@@ -217,21 +238,22 @@ function DeliveryRow({
               })
             }
           >
-            unpaid
-          </button>
-          <button
-            className="text-sm muted underline"
+            Unpaid
+          </Button>
+          <Button
+            size="sm"
+            variant="ghost"
             disabled={busy}
             onClick={() => onMark({ status: "skipped" })}
           >
-            skip
-          </button>
+            Skip
+          </Button>
         </div>
       )}
 
       {(done || skipped) && (
         <button
-          className="text-xs muted underline"
+          className="mt-2 text-[12px] text-ink-mute hover:text-ink"
           disabled={busy}
           onClick={() =>
             onMark({
@@ -244,9 +266,9 @@ function DeliveryRow({
             })
           }
         >
-          undo
+          Undo
         </button>
       )}
-    </li>
+    </div>
   );
 }

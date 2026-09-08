@@ -33,5 +33,6 @@ breeding, health, feed, expenses, both sales channels, and combined financials
   app. The delivery runner is the only restricted role (0007).
 - Bigger build than the original "thin internal app" — sequenced core-first
   (0009), not all shipped on day one.
-- Project ownership, cost, and branding are shared three ways. The name "M-cli"
-  is still a placeholder.
+- Project ownership, cost, and branding are shared three ways. The application
+  is branded **Milk Garage** (rebranded 2026-09-09 from the working title
+  "M-cli"; the GitHub repo slug is unchanged). Legal structure is still open.

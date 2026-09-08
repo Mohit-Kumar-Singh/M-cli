@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Offline · Milk Garage</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #f5f5f1;
+        --card: #ffffff;
+        --ink: #191e28;
+        --mute: #7c8593;
+        --accent: #1f6f5c;
+        --line: #e6e5dd;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #10141c;
+          --card: #171c27;
+          --ink: #e9ecf1;
+          --mute: #7e8794;
+          --accent: #3fa88a;
+          --line: #29313f;
+        }
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 28px;
+        max-width: 360px;
+        text-align: center;
+      }
+      svg { display: block; margin: 0 auto 14px; }
+      h1 { font-size: 1.1rem; margin: 0 0 6px; }
+      p { font-size: 0.875rem; color: var(--mute); margin: 0 0 16px; line-height: 1.5; }
+      button {
+        font: inherit;
+        font-weight: 600;
+        border: none;
+        border-radius: 10px;
+        padding: 10px 18px;
+        background: var(--accent);
+        color: #fff;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <svg width="44" height="44" viewBox="0 0 512 512" aria-hidden="true">
+        <rect width="512" height="512" rx="118" fill="var(--accent)" />
+        <path
+          fill="var(--card)"
+          d="M222 120h68v34a44 44 0 0 0 12 30l14 15a48 48 0 0 1 13 33v106a26 26 0 0 1-26 26H197a26 26 0 0 1-26-26V232a48 48 0 0 1 13-33l14-15a44 44 0 0 0 12-30z"
+        />
+        <rect x="210" y="92" width="92" height="32" rx="9" fill="#e4b24a" />
+      </svg>
+      <h1>You're offline</h1>
+      <p>
+        Milk Garage needs a connection to load your herd and rounds. Reconnect
+        and try again.
+      </p>
+      <button onclick="location.reload()">Retry</button>
+    </div>
+  </body>
+</html>

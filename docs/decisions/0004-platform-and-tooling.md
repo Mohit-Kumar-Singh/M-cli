@@ -15,9 +15,17 @@ pause orders, feeding the same backend.
 
 - **Mobile-first, installable as a PWA.** Field use (delivery round, milking
   shed, feed entry) is phone-first; owners also use a laptop for financials.
+  Shipped: web manifest, maskable icons, service worker, offline shell +
+  fallback page. The SW never caches Supabase traffic, so auth/data stay live.
+- **Branding: Milk Garage** — spruce-green + butter-gold on warm paper, deep
+  blue-charcoal in dark mode. One design-token system (`web/src/index.css`),
+  system/light/dark theme with a persisted toggle, a small reusable UI kit
+  (`web/src/ui/`), desktop sidebar / mobile bottom-nav layout.
 - **Roles:** *Owner* (operator, Aman, Manjeet) — full access. *Delivery
   runner* — retail delivery list only. *Dairy hand* (optional, later) —
   production + feed entry only.
+- **Deploy:** Vercel (root `web/`, Vite preset), `vercel.json` for SPA
+  rewrites + cache headers. Env: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`.
 - Customer-facing self-service (login, in-app payment, self-serve pause) is
   **later**, after the round has been run enough to know how it works.
 

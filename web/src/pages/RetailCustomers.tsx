@@ -1,14 +1,30 @@
 import { useEffect, useState, type FormEvent } from "react";
+import { Plus, Users } from "lucide-react";
 import { supabase, supabaseConfigured } from "../lib/supabase";
 import { addDays, isoDate } from "../lib/dates";
 import type { RetailCustomer } from "../types/db";
+import {
+  PageHeader,
+  Button,
+  Card,
+  ListCard,
+  Field,
+  Input,
+  Select,
+  Badge,
+  EmptyState,
+  SkeletonList,
+} from "../ui";
+
+type Filter = "all" | "regular" | "casual" | "inactive";
+const FILTERS: Filter[] = ["all", "regular", "casual", "inactive"];
 
 export default function RetailCustomers() {
   const [rows, setRows] = useState<RetailCustomer[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editing, setEditing] = useState<RetailCustomer | "new" | null>(null);
-  const [filter, setFilter] = useState<"all" | "regular" | "casual" | "inactive">("all");
+  const [filter, setFilter] = useState<Filter>("all");
 
   async function load() {
     if (!supabaseConfigured) return setLoading(false);
@@ -33,85 +49,98 @@ export default function RetailCustomers() {
   });
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-lg font-bold">Retail customers</h1>
-        <button className="btn-primary" onClick={() => setEditing("new")}>
-          Add customer
-        </button>
-      </div>
-
-      {!supabaseConfigured && (
-        <p className="card p-4 text-sm" style={{ color: "var(--danger)" }}>
-          Connect Supabase to manage customers.
-        </p>
-      )}
+    <div>
+      <PageHeader
+        title="Retail customers"
+        subtitle={loading ? undefined : `${rows.length} on the round`}
+        actions={
+          <Button size="sm" icon={<Plus size={16} />} onClick={() => setEditing("new")}>
+            Add
+          </Button>
+        }
+      />
 
       {editing && (
-        <CustomerForm
-          initial={editing === "new" ? null : editing}
-          onClose={() => setEditing(null)}
-          onSaved={() => {
-            setEditing(null);
-            void load();
-          }}
-        />
+        <div className="mb-4">
+          <CustomerForm
+            initial={editing === "new" ? null : editing}
+            onClose={() => setEditing(null)}
+            onSaved={() => {
+              setEditing(null);
+              void load();
+            }}
+          />
+        </div>
       )}
 
-      <div className="flex gap-1 text-sm">
-        {(["all", "regular", "casual", "inactive"] as const).map((f) => (
+      <div className="flex gap-1.5 mb-3">
+        {FILTERS.map((f) => (
           <button
             key={f}
             onClick={() => setFilter(f)}
-            className="rounded-lg px-2.5 py-1"
-            style={
+            className={`rounded-full px-3 py-1 text-[12px] font-medium border transition-colors ${
               filter === f
-                ? { background: "var(--accent)", color: "var(--accent-ink)" }
-                : { color: "var(--ink-muted)" }
-            }
+                ? "bg-accent text-[var(--text-on-accent)] border-transparent"
+                : "border-[var(--border-subtle)] text-ink-mute hover:text-ink-soft"
+            }`}
           >
             {f}
           </button>
         ))}
       </div>
 
-      {error && <p className="text-sm" style={{ color: "var(--danger)" }}>{error}</p>}
+      {error && <p className="text-[13px] text-danger mb-3">{error}</p>}
+
       {loading ? (
-        <p className="muted text-sm">Loading…</p>
+        <SkeletonList rows={5} />
       ) : shown.length === 0 ? (
-        <p className="muted text-sm">No customers.</p>
+        <EmptyState
+          icon={<Users size={18} />}
+          title={rows.length === 0 ? "No customers yet" : "Nothing matches this filter"}
+          description={
+            rows.length === 0
+              ? "Add the households on your round. Mark someone “regular” to give them a standing daily quantity and a price lock."
+              : undefined
+          }
+          action={
+            rows.length === 0 ? (
+              <Button size="sm" icon={<Plus size={16} />} onClick={() => setEditing("new")}>
+                Add customer
+              </Button>
+            ) : undefined
+          }
+        />
       ) : (
-        <ul className="space-y-2">
-          {shown.map((c) => (
-            <li key={c.id}>
+        <ListCard>
+          {shown.map((c) => {
+            const locked = c.price_lock_until != null && c.price_lock_until >= isoDate();
+            return (
               <button
-                className="card p-3 w-full text-left flex items-center justify-between"
+                key={c.id}
                 onClick={() => setEditing(c)}
+                className="w-full text-left flex items-center justify-between gap-3 p-3.5 hover:bg-sunken transition-colors"
               >
-                <div>
-                  <div className="font-medium">
-                    {c.name}{" "}
-                    <span className="muted text-xs">{c.area ?? ""}</span>
+                <div className="min-w-0">
+                  <div className="font-medium text-ink truncate">
+                    {c.name}
+                    {c.area ? <span className="text-ink-mute"> · {c.area}</span> : null}
                   </div>
-                  <div className="muted text-xs">
-                    {c.type}
+                  <div className="text-[12px] text-ink-mute tnum">
+                    ₹{c.price_per_kg}/kg
                     {c.type === "regular" && c.fixed_daily_qty_kg
                       ? ` · ${c.fixed_daily_qty_kg} kg/day`
                       : ""}
-                    {" · ₹"}
-                    {c.price_per_kg}/kg
-                    {c.price_lock_until && c.price_lock_until >= isoDate()
-                      ? ` · locked to ${c.price_lock_until}`
-                      : ""}
+                    {locked ? " · price locked" : ""}
                   </div>
                 </div>
-                {c.status === "inactive" && (
-                  <span className="text-xs muted">inactive</span>
-                )}
+                <div className="flex items-center gap-1.5 shrink-0">
+                  {c.status === "inactive" && <Badge tone="neutral">inactive</Badge>}
+                  <Badge tone={c.type === "regular" ? "accent" : "neutral"}>{c.type}</Badge>
+                </div>
               </button>
-            </li>
-          ))}
-        </ul>
+            );
+          })}
+        </ListCard>
       )}
     </div>
   );
@@ -149,10 +178,7 @@ function CustomerForm({
     setError(null);
 
     const becomingRegular = type === "regular" && initial?.type !== "regular";
-    const regularSince =
-      type === "regular"
-        ? initial?.regular_since ?? isoDate()
-        : null;
+    const regularSince = type === "regular" ? initial?.regular_since ?? isoDate() : null;
     const priceLockUntil =
       type === "regular"
         ? initial?.price_lock_until ?? addDays(isoDate(), 182) // ~6 months (0005)
@@ -170,7 +196,10 @@ function CustomerForm({
       round_sequence: roundSeq ? parseInt(roundSeq, 10) : null,
       referral_source: referral.trim() || null,
       regular_since: regularSince,
-      price_lock_until: becomingRegular || !initial ? priceLockUntil : initial?.price_lock_until ?? priceLockUntil,
+      price_lock_until:
+        becomingRegular || !initial
+          ? priceLockUntil
+          : initial?.price_lock_until ?? priceLockUntil,
     };
 
     const { error } = initial
@@ -183,72 +212,101 @@ function CustomerForm({
   }
 
   return (
-    <form onSubmit={submit} className="card p-4 space-y-3">
-      <div className="flex items-center justify-between">
-        <h2 className="font-bold">{initial ? "Edit" : "New"} customer</h2>
-        <button type="button" className="text-sm muted" onClick={onClose}>
-          Close
-        </button>
-      </div>
-      <div className="grid grid-cols-2 gap-3">
-        <label className="text-sm col-span-2">
-          Name
-          <input className="input mt-1" value={name} onChange={(e) => setName(e.target.value)} required />
-        </label>
-        <label className="text-sm">
-          Phone
-          <input className="input mt-1" value={phone} onChange={(e) => setPhone(e.target.value)} />
-        </label>
-        <label className="text-sm">
-          Area / lane
-          <input className="input mt-1" value={area} onChange={(e) => setArea(e.target.value)} />
-        </label>
-        <label className="text-sm col-span-2">
-          Address
-          <input className="input mt-1" value={address} onChange={(e) => setAddress(e.target.value)} />
-        </label>
-        <label className="text-sm">
-          Type
-          <select className="input mt-1" value={type} onChange={(e) => setType(e.target.value as "casual" | "regular")}>
-            <option value="casual">casual</option>
-            <option value="regular">regular</option>
-          </select>
-        </label>
-        <label className="text-sm">
-          Status
-          <select className="input mt-1" value={status} onChange={(e) => setStatus(e.target.value as "active" | "inactive")}>
-            <option value="active">active</option>
-            <option value="inactive">inactive</option>
-          </select>
-        </label>
+    <Card>
+      <form onSubmit={submit} className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h2 className="font-display font-bold text-ink">
+            {initial ? "Edit customer" : "New customer"}
+          </h2>
+          <button type="button" className="text-[13px] text-ink-mute hover:text-ink" onClick={onClose}>
+            Close
+          </button>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <Field label="Name" className="col-span-2">
+            {(id) => <Input id={id} value={name} onChange={(e) => setName(e.target.value)} required />}
+          </Field>
+          <Field label="Phone">
+            {(id) => <Input id={id} value={phone} onChange={(e) => setPhone(e.target.value)} />}
+          </Field>
+          <Field label="Area / lane">
+            {(id) => <Input id={id} value={area} onChange={(e) => setArea(e.target.value)} />}
+          </Field>
+          <Field label="Address" className="col-span-2">
+            {(id) => <Input id={id} value={address} onChange={(e) => setAddress(e.target.value)} />}
+          </Field>
+          <Field label="Type">
+            {(id) => (
+              <Select
+                id={id}
+                value={type}
+                onChange={(e) => setType(e.target.value as "casual" | "regular")}
+              >
+                <option value="casual">casual</option>
+                <option value="regular">regular</option>
+              </Select>
+            )}
+          </Field>
+          <Field label="Status">
+            {(id) => (
+              <Select
+                id={id}
+                value={status}
+                onChange={(e) => setStatus(e.target.value as "active" | "inactive")}
+              >
+                <option value="active">active</option>
+                <option value="inactive">inactive</option>
+              </Select>
+            )}
+          </Field>
+          {type === "regular" && (
+            <Field label="Fixed kg/day">
+              {(id) => (
+                <Input
+                  id={id}
+                  inputMode="decimal"
+                  value={qtyKg}
+                  onChange={(e) => setQtyKg(e.target.value)}
+                />
+              )}
+            </Field>
+          )}
+          <Field label="₹ / kg">
+            {(id) => (
+              <Input
+                id={id}
+                inputMode="decimal"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+              />
+            )}
+          </Field>
+          <Field label="Round #">
+            {(id) => (
+              <Input
+                id={id}
+                inputMode="numeric"
+                value={roundSeq}
+                onChange={(e) => setRoundSeq(e.target.value)}
+              />
+            )}
+          </Field>
+          <Field label="Referred by">
+            {(id) => (
+              <Input id={id} value={referral} onChange={(e) => setReferral(e.target.value)} />
+            )}
+          </Field>
+        </div>
         {type === "regular" && (
-          <label className="text-sm">
-            Fixed kg/day
-            <input className="input mt-1" inputMode="decimal" value={qtyKg} onChange={(e) => setQtyKg(e.target.value)} />
-          </label>
+          <p className="text-[12px] text-ink-mute">
+            Regulars get a 6-month ₹{price}/kg price lock from their start date (decision 0005).
+          </p>
         )}
-        <label className="text-sm">
-          ₹/kg
-          <input className="input mt-1" inputMode="decimal" value={price} onChange={(e) => setPrice(e.target.value)} />
-        </label>
-        <label className="text-sm">
-          Round #
-          <input className="input mt-1" inputMode="numeric" value={roundSeq} onChange={(e) => setRoundSeq(e.target.value)} />
-        </label>
-        <label className="text-sm">
-          Referred by
-          <input className="input mt-1" value={referral} onChange={(e) => setReferral(e.target.value)} />
-        </label>
-      </div>
-      {type === "regular" && (
-        <p className="muted text-xs">
-          Regulars get a 6-month ₹{price}/kg price lock from their start date (0005).
-        </p>
-      )}
-      {error && <p className="text-sm" style={{ color: "var(--danger)" }}>{error}</p>}
-      <button className="btn-primary" disabled={busy}>
-        {busy ? "Saving…" : "Save customer"}
-      </button>
-    </form>
+        {error && <p className="text-[13px] text-danger">{error}</p>}
+        <Button type="submit" loading={busy}>
+          Save customer
+        </Button>
+      </form>
+    </Card>
   );
 }

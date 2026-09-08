@@ -84,7 +84,8 @@ Dashboard/financials**. Plus a **WhatsApp ordering bot** for retail.
 4. **Supply caps growth** (accepted) — expand herd or add vetted vendors ahead
    of demand.
 5. **Regular-customer payment model** (prepaid vs monthly) undecided.
-6. **Business name / legal structure** undecided ("M-cli" is a placeholder).
+6. **Legal structure** undecided. The app is branded **Milk Garage**; the
+   registered business name is still open.
 7. **Scope vs. November** — full app (0007) won't all land by launch; core-first
    sequencing (0009) is the plan.
 8. **WhatsApp bot** needs Meta Business onboarding; may start manual.

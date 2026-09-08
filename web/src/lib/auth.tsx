@@ -21,13 +21,22 @@ interface AuthState {
 
 const AuthContext = createContext<AuthState | undefined>(undefined);
 
+// Dev-only: VITE_PREVIEW_ROLE=owner lets you browse the UI without signing in.
+// Never set this in the Vercel project — it is ignored outside `vite dev`.
+const previewRole =
+  import.meta.env.DEV && import.meta.env.VITE_PREVIEW_ROLE
+    ? (import.meta.env.VITE_PREVIEW_ROLE as Role)
+    : null;
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false);
   const [session, setSession] = useState<Session | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(
+    previewRole ? { id: "preview", full_name: "Preview", role: previewRole, created_at: "" } : null,
+  );
 
   useEffect(() => {
-    if (!supabaseConfigured) {
+    if (!supabaseConfigured || previewRole) {
       setReady(true);
       return;
     }
@@ -42,6 +51,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
+    if (previewRole) return;
     if (!session?.user) {
       setProfile(null);
       return;

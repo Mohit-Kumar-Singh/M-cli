@@ -1,9 +1,25 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { Milk } from "lucide-react";
 import { supabase, supabaseConfigured } from "../lib/supabase";
-import { isoDate, prettyDate, addDays } from "../lib/dates";
+import { isoDate } from "../lib/dates";
 import type { Animal, MilkProduction } from "../types/db";
+import {
+  PageHeader,
+  Button,
+  Card,
+  ListCard,
+  Input,
+  Segmented,
+  DateStepper,
+  EmptyState,
+  SkeletonList,
+} from "../ui";
 
 type Session = "morning" | "evening";
+const SESSIONS = [
+  { value: "morning" as const, label: "Morning" },
+  { value: "evening" as const, label: "Evening" },
+];
 
 export default function Production() {
   const [date, setDate] = useState(isoDate());
@@ -24,11 +40,7 @@ export default function Production() {
     setLoading(true);
     setMsg(null);
     const [a, rows, day] = await Promise.all([
-      supabase
-        .from("animals")
-        .select("*")
-        .eq("status", "milking")
-        .order("tag_no"),
+      supabase.from("animals").select("*").eq("status", "milking").order("tag_no"),
       supabase
         .from("milk_production")
         .select("*")
@@ -54,8 +66,7 @@ export default function Production() {
   }, [load]);
 
   const sessionTotal = useMemo(
-    () =>
-      Object.values(qty).reduce((s, v) => s + (parseFloat(v) || 0), 0),
+    () => Object.values(qty).reduce((s, v) => s + (parseFloat(v) || 0), 0),
     [qty],
   );
 
@@ -67,7 +78,6 @@ export default function Production() {
       .filter((r) => !Number.isNaN(r.qty_kg))
       .map((r) => ({ ...r, date, session }));
 
-    // Delete rows the user cleared, upsert the rest.
     const clearedIds = savedRows
       .filter((r) => r.animal_id && !rows.some((n) => n.animal_id === r.animal_id))
       .map((r) => r.id);
@@ -84,108 +94,72 @@ export default function Production() {
     setSaving(false);
     if (error) setMsg(error.message);
     else {
-      setMsg("Saved.");
+      setMsg("Saved");
       void load();
     }
   }
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-lg font-bold">Production</h1>
+    <div>
+      <PageHeader title="Production" subtitle="Log the milk from each animal, per session." />
 
-      {!supabaseConfigured && (
-        <p className="card p-4 text-sm" style={{ color: "var(--danger)" }}>
-          Connect Supabase to record production.
-        </p>
-      )}
-
-      <div className="card p-3 flex flex-wrap items-center gap-3">
-        <button className="text-sm muted" onClick={() => setDate(addDays(date, -1))}>
-          ‹ prev
-        </button>
-        <input
-          className="input w-auto"
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-        />
-        <button
-          className="text-sm muted"
-          onClick={() => setDate(addDays(date, 1))}
-          disabled={date >= isoDate()}
-        >
-          next ›
-        </button>
-        <div className="flex gap-1 ml-auto">
-          {(["morning", "evening"] as const).map((s) => (
-            <button
-              key={s}
-              onClick={() => setSession(s)}
-              className="rounded-lg px-3 py-1 text-sm"
-              style={
-                session === s
-                  ? { background: "var(--accent)", color: "var(--accent-ink)" }
-                  : { color: "var(--ink-muted)" }
-              }
-            >
-              {s}
-            </button>
-          ))}
-        </div>
+      <div className="space-y-3 mb-4">
+        <DateStepper value={date} onChange={setDate} max={isoDate()} />
+        <Segmented value={session} onChange={setSession} options={SESSIONS} />
       </div>
-
-      <p className="muted text-sm">
-        {prettyDate(date)} · {session} · {animals.length} milking animals
-      </p>
 
       {loading ? (
-        <p className="muted text-sm">Loading…</p>
+        <SkeletonList rows={5} />
       ) : animals.length === 0 ? (
-        <p className="muted text-sm">
-          No animals with status “milking”. Set an animal to milking in Herd.
-        </p>
+        <EmptyState
+          icon={<Milk size={18} />}
+          title="No milking animals"
+          description="Set an animal's status to “milking” in the Herd screen and it will appear here."
+        />
       ) : (
-        <div className="card divide-y" style={{ borderColor: "var(--border)" }}>
+        <ListCard>
           {animals.map((a) => (
-            <div key={a.id} className="flex items-center gap-3 p-3">
-              <div className="flex-1">
-                <div className="font-medium">
+            <label key={a.id} className="flex items-center gap-3 p-3.5">
+              <span className="flex-1 min-w-0">
+                <span className="block font-medium text-ink truncate">
                   {a.tag_no}
-                  {a.name ? ` · ${a.name}` : ""}
-                </div>
-              </div>
-              <input
-                className="input w-24 text-right"
+                  {a.name ? <span className="text-ink-mute"> · {a.name}</span> : null}
+                </span>
+              </span>
+              <Input
                 inputMode="decimal"
                 placeholder="kg"
+                className="w-24 text-right tnum"
                 value={qty[a.id] ?? ""}
-                onChange={(e) =>
-                  setQty((q) => ({ ...q, [a.id]: e.target.value }))
-                }
+                onChange={(e) => setQty((q) => ({ ...q, [a.id]: e.target.value }))}
               />
-            </div>
+            </label>
           ))}
-        </div>
+        </ListCard>
       )}
 
-      <div className="flex items-center justify-between">
-        <div className="text-sm">
-          <div>
-            <span className="muted">This session: </span>
-            <span className="font-bold">{sessionTotal.toFixed(2)} kg</span>
+      {!loading && animals.length > 0 && (
+        <Card className="mt-3 flex items-center justify-between gap-3">
+          <div className="text-[13px]">
+            <div>
+              <span className="text-ink-mute">This session </span>
+              <span className="font-bold text-ink tnum">{sessionTotal.toFixed(2)} kg</span>
+            </div>
+            <div className="text-ink-mute">
+              Day so far, saved:{" "}
+              <span className="font-medium text-ink-soft tnum">
+                {dayTotal == null ? "—" : dayTotal.toFixed(2)} kg
+              </span>
+            </div>
           </div>
-          <div>
-            <span className="muted">Day so far (saved): </span>
-            <span className="font-bold">
-              {dayTotal == null ? "—" : dayTotal.toFixed(2)} kg
-            </span>
+          <div className="flex items-center gap-3">
+            {msg && <span className="text-[13px] text-ink-mute">{msg}</span>}
+            <Button onClick={save} loading={saving} disabled={!supabaseConfigured}>
+              Save session
+            </Button>
           </div>
-        </div>
-        <button className="btn-primary" onClick={save} disabled={saving || !supabaseConfigured}>
-          {saving ? "Saving…" : "Save session"}
-        </button>
-      </div>
-      {msg && <p className="text-sm muted">{msg}</p>}
+        </Card>
+      )}
     </div>
   );
 }

@@ -1,6 +1,9 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./lib/auth";
+import { ThemeProvider } from "./lib/theme";
 import Layout from "./components/Layout";
+import { Wordmark } from "./components/Wordmark";
+import { Spinner } from "./ui";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Herd from "./pages/Herd";
@@ -12,13 +15,25 @@ import Wholesale from "./pages/Wholesale";
 import Balance from "./pages/Balance";
 import Placeholder from "./pages/Placeholder";
 
+function Splash() {
+  return (
+    <div className="min-h-full grid place-items-center gap-3">
+      <div className="flex flex-col items-center gap-3 text-ink-mute">
+        <Wordmark />
+        <Spinner size={18} />
+      </div>
+    </div>
+  );
+}
+
 function Gate() {
-  const { ready, session, configured } = useAuth();
+  const { ready, session, profile, configured } = useAuth();
 
-  if (!ready) return <Centered>Loading…</Centered>;
+  if (!ready) return <Splash />;
 
-  // Let the app render without a backend so screens can be built (0008).
-  if (configured && !session) return <Login />;
+  // Render without a backend so screens can be built (0008). `profile` is also
+  // set in dev preview mode (VITE_PREVIEW_ROLE), which bypasses sign-in.
+  if (configured && !session && !profile) return <Login />;
 
   return (
     <Routes>
@@ -36,9 +51,13 @@ function Gate() {
           element={
             <Placeholder
               title="Feed & inputs"
-              milestone="M2"
+              milestone="Milestone 2"
               spec="0007 · Module 5"
-              points={["Feed items + stock", "Purchases", "Daily consumption → feed cost / kg milk"]}
+              points={[
+                "Feed items and stock on hand",
+                "Purchases — quantity, cost, supplier",
+                "Daily consumption, rolled up to feed cost per kg of milk",
+              ]}
             />
           }
         />
@@ -47,9 +66,12 @@ function Gate() {
           element={
             <Placeholder
               title="Expenses"
-              milestone="M2"
+              milestone="Milestone 2"
               spec="0007 · Module 6"
-              points={["Categorized non-feed expenses", "Recurring templates (wages, electricity)"]}
+              points={[
+                "Categorised non-feed expenses",
+                "Recurring templates for wages and electricity",
+              ]}
             />
           }
         />
@@ -58,12 +80,12 @@ function Gate() {
           element={
             <Placeholder
               title="Health & veterinary"
-              milestone="M2"
+              milestone="Milestone 2"
               spec="0007 · Module 4"
               points={[
-                "Vaccination / deworming schedule",
-                "Treatments + cost → Expenses",
-                "Milk-withdrawal periods feed the daily balance",
+                "Vaccination and deworming schedule",
+                "Treatments and cost, flowing into Expenses",
+                "Milk-withdrawal periods that feed the daily balance",
               ]}
             />
           }
@@ -73,12 +95,12 @@ function Gate() {
           element={
             <Placeholder
               title="Breeding & reproduction"
-              milestone="M3"
+              milestone="Milestone 3"
               spec="0007 · Module 3"
               points={[
-                "Heat / service / PD / calving / dry-off events",
-                "Calving → new Herd record; lactation number increment",
-                "Calendar: upcoming calvings, due dry-offs",
+                "Heat, service, pregnancy check, calving and dry-off events",
+                "Calving creates the calf's herd record and bumps lactation number",
+                "Calendar of upcoming calvings and due dry-offs",
               ]}
             />
           }
@@ -89,20 +111,14 @@ function Gate() {
   );
 }
 
-function Centered({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="min-h-full flex items-center justify-center muted text-sm">
-      {children}
-    </div>
-  );
-}
-
 export default function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <Gate />
-      </BrowserRouter>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <BrowserRouter>
+          <Gate />
+        </BrowserRouter>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
