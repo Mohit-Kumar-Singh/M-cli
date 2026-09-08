@@ -3,23 +3,35 @@
 Database migrations and (later) Edge Functions for M-cli. Stack rationale in
 [`../docs/decisions/0008-tech-stack.md`](../docs/decisions/0008-tech-stack.md).
 
-## Provision (one owner does this once)
+## Provisioned
 
-1. Create a project at supabase.com. Note the project URL + anon key.
-2. Link and push migrations:
-   ```bash
-   npx supabase link --project-ref <ref>
-   npx supabase db push
-   ```
-3. Create the three owner logins in Auth → Users, then set each one's role:
+- Project ref: **`pcwelnsubcbmftksnsjf`**, region ap-south-1 (Mumbai), free tier.
+- URL: `https://pcwelnsubcbmftksnsjf.supabase.co`
+- Migration `0001_core_schema.sql` is **applied**. RLS verified by scoped query
+  as owner / delivery_runner / unknown user.
+- `../web/.env.local` is set with the URL + publishable key.
+
+## Remaining one-time step — create the logins (an owner does this)
+
+1. In the Supabase dashboard → **Authentication → Users → Add user**, create a
+   login (email + password) for the operator, Aman, and Manjeet.
+2. Copy each user's UID, then in **SQL Editor** run:
    ```sql
    insert into profiles (id, full_name, role) values
-     ('<auth-user-uuid>', 'Operator', 'owner'),
-     ('<auth-user-uuid>', 'Aman', 'owner'),
-     ('<auth-user-uuid>', 'Manjeet', 'owner');
+     ('<operator-uid>', 'Operator', 'owner'),
+     ('<aman-uid>',     'Aman',     'owner'),
+     ('<manjeet-uid>',  'Manjeet',  'owner');
    ```
-   The delivery runner gets a login later with `role = 'delivery_runner'`.
-4. Put the URL + anon key in `../web/.env.local` (see `../web/.env.example`).
+   (New signups default to `role = 'delivery_runner'` until promoted here.)
+3. The delivery runner gets their own login later, left at
+   `role = 'delivery_runner'`.
+
+## Applying later migrations
+
+```bash
+npx supabase link --project-ref pcwelnsubcbmftksnsjf
+npx supabase db push
+```
 
 ## Migrations
 

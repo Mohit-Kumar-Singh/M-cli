@@ -13,7 +13,8 @@ const NAV: NavItem[] = [
   { to: "/", label: "Dashboard", roles: ["owner"] },
   { to: "/herd", label: "Herd", roles: ["owner"] },
   { to: "/production", label: "Production", roles: ["owner", "dairy_hand"] },
-  { to: "/retail", label: "Retail", roles: ["owner"] },
+  { to: "/retail", label: "Retail customers", roles: ["owner"] },
+  { to: "/retail/orders", label: "Orders", roles: ["owner"] },
   { to: "/deliveries", label: "Deliveries", roles: ["owner", "delivery_runner"] },
   { to: "/wholesale", label: "Wholesale", roles: ["owner"] },
   { to: "/balance", label: "Milk balance", roles: ["owner"] },
@@ -44,7 +45,7 @@ export default function Layout() {
           <NavLink
             key={i.to}
             to={i.to}
-            end={i.to === "/"}
+            end={i.to === "/" || i.to === "/retail"}
             className={({ isActive }) =>
               `whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-medium ${
                 isActive ? "text-white" : "muted"

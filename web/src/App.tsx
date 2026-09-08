@@ -4,6 +4,12 @@ import Layout from "./components/Layout";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Herd from "./pages/Herd";
+import Production from "./pages/Production";
+import RetailCustomers from "./pages/RetailCustomers";
+import RetailOrders from "./pages/RetailOrders";
+import Deliveries from "./pages/Deliveries";
+import Wholesale from "./pages/Wholesale";
+import Balance from "./pages/Balance";
 import Placeholder from "./pages/Placeholder";
 
 function Gate() {
@@ -19,81 +25,12 @@ function Gate() {
       <Route element={<Layout />}>
         <Route index element={<Dashboard />} />
         <Route path="herd" element={<Herd />} />
-        <Route
-          path="production"
-          element={
-            <Placeholder
-              title="Production"
-              milestone="M1"
-              spec="0007 · Module 2"
-              points={[
-                "Session-entry grid: every milking animal, tab down the column",
-                "Rollups: per animal/day, per session, herd/day, herd/month",
-                "Flag sharp drop vs the animal's trailing average",
-              ]}
-            />
-          }
-        />
-        <Route
-          path="retail"
-          element={
-            <Placeholder
-              title="Retail sales"
-              milestone="M1"
-              spec="0007 · Module 8"
-              points={[
-                "Customer list (casual / regular), price-lock date, payment mode",
-                "Tomorrow's orders — pre-fill regulars, add casual, freeze at ~9pm",
-                "Conversion candidates: casual customers with a good history",
-              ]}
-            />
-          }
-        />
-        <Route
-          path="deliveries"
-          element={
-            <Placeholder
-              title="Today's delivery list"
-              milestone="M1"
-              spec="0007 · Module 8"
-              points={[
-                "Sorted by round_sequence, regulars first",
-                "Mark delivered / skipped, partial qty allowed",
-                "Collect payment: UPI / cash + amount",
-              ]}
-            />
-          }
-        />
-        <Route
-          path="wholesale"
-          element={
-            <Placeholder
-              title="Wholesale sales"
-              milestone="M1"
-              spec="0007 · Module 7"
-              points={[
-                "Halwai customers with per-customer rate and balance",
-                "Daily dispatch entry (qty, rate snapshot, amount)",
-                "Outstanding dues + payment recording",
-              ]}
-            />
-          }
-        />
-        <Route
-          path="balance"
-          element={
-            <Placeholder
-              title="Daily milk balance"
-              milestone="M1"
-              spec="0007 · Module 9"
-              points={[
-                "produced = wholesale + retail + own use + wastage ± buffer Δ",
-                "sellable = produced − milk under vet withdrawal",
-                "cash / UPI / unpaid totals across both channels",
-              ]}
-            />
-          }
-        />
+        <Route path="production" element={<Production />} />
+        <Route path="retail" element={<RetailCustomers />} />
+        <Route path="retail/orders" element={<RetailOrders />} />
+        <Route path="deliveries" element={<Deliveries />} />
+        <Route path="wholesale" element={<Wholesale />} />
+        <Route path="balance" element={<Balance />} />
         <Route
           path="feed"
           element={
