@@ -1,97 +1,90 @@
 # Business overview
 
-_Last updated: 2026-09-07. This is a living summary; the `decisions/` files are
-the authoritative record of each individual choice._
+_Last updated: 2026-09-09. Living summary; the `decisions/` files are the
+authoritative record of each choice._
 
-## The idea
+## The business
 
-There are two businesses:
+**One milk business, three equal co-owners** — the operator, Aman, Manjeet.
+(Originally two separate ventures — a dairy and a retail reseller — merged on
+2026-09-09 into one business with one set of books. See 0001.)
 
-1. **The dairy** — run by Aman & Manjeet as a **separate entity**. 8–10
-   buffalo. Their core business is selling whole buffalo milk **in bulk to
-   sweet shops (halwais)**. Build timeline is not fixed yet.
+- **Production:** an 8–10 buffalo herd. ~70–80 kg/day at capacity.
+- **Two sales channels:**
+  - **Wholesale** — bulk to sweet shops (halwais). Core volume. Absorbs any
+    surplus, so retail milk is never wasted.
+  - **Retail** — household home delivery. **₹60/kg**, delivery included, order
+    as little as you want, **no monthly lock-in**.
 
-2. **M-cli (this venture)** — a **retail** business sitting between that dairy
-   and households. We take milk from the dairy and deliver it to homes daily.
+## Positioning (retail)
 
-Our edge: we can pull a **flexible** quantity from the dairy day to day
-(a few kg or ~20 kg) instead of committing to a fixed volume, so we can afford
-to offer customers the same flexibility.
+> Pure, unadulterated buffalo milk. Delivered. Order as little as you want.
+> No monthly lock-in.
 
-## Supply
+Against packet milk (Amul / Mother Dairy): fresh buffalo milk, not toned
+packet milk, at the door. Against the local doodhwala: no dilution, no forced
+fixed quantity or monthly commitment.
 
-- **Source:** Aman & Manjeet's dairy. They **guarantee** our supply.
-- **Buffer:** we hold **15–20 kg** of milk in our own fridge to cover a spike
-  in next-day demand, so both businesses can operate smoothly.
-- **Overflow / spoilage:** milk we take but don't sell **recirculates back to
-  the halwais**, who can absorb effectively unlimited quantity. This is the
-  single most important fact in the whole plan — it means unsold stock is
-  **not a write-off**, which is what makes a no-commitment customer offer safe
-  to give.
-- **Cost to us:** assume **₹55/kg** for now. Not firmly negotiated.
+## Retail customers
 
-## Pricing
-
-- **₹60/kg**, home delivery included, for the **first 10 kg/day per customer**.
-- Above 10 kg/day per customer (tea stalls, small shops) — price negotiated
-  case by case.
-- **No delivery fee at start.** Revisit price and/or add a delivery fee once
-  volume is proven.
-- Gross margin at retail is **~₹5/kg (~8%)** — thin. See risks.
-
-## Customers
-
-Two types:
-
-| Type | How they order | How they pay | Perks |
+| Type | Orders | Pays | Perks |
 |---|---|---|---|
-| **Casual / daily** | Order before a fixed nightly **cutoff** (~9 pm) for next-morning delivery. No commitment. | Per delivery — UPI or cash on the spot. | None |
-| **Regular / fixed** | Standing daily quantity. Pause anytime before the cutoff — WhatsApp first, app later. Pays even if they forget to pause. | **Prepaid recharge** or **monthly bill** — TBD. | Guaranteed supply on short days; ₹60/kg locked for 6 months; earlier slot; priority on extras. |
+| **Casual** | Before the ~9 pm cutoff for next morning. No commitment. | Per delivery — UPI/cash on the spot. | None |
+| **Regular** | Standing daily qty. Pause anytime before the cutoff — WhatsApp first, app later. Pays even if they forget to pause. | Prepaid recharge or monthly bill — TBD. | Guaranteed supply on short days; ₹60/kg locked 6 months; earlier slot; priority on extras. |
 
-**Goal:** convince casual customers to become regular fixed customers.
+Goal: convert casual customers into regulars.
 
-## Capacity and economics (see 0006)
+## Money
 
-- Herd: **8–10 buffalo → ~70–80 kg/day max**, and only if halwais are bypassed.
-  Retail gets a **carve-out** of that, not all of it.
-- **50 households (~50–75 kg/day) ≈ the whole herd** — a medium-term ceiling,
-  not a launch number (accepted). Launch is really ~15–20 households /
-  ~20–30 kg/day. Once proven, grow supply to match demand: more buffalo, or
-  vetted third-party vendors redistributed under the same quality standard.
-- Margin ₹5/kg → ~₹2,700/month gross at 15 regulars. **Net negative until
-  ~40–50 kg/day.**
-- Therefore: **operator delivers themselves at launch**; paid delivery boy and
-  the price step-up both wait until ~40–50 kg/day. Herd expansion is the growth
-  lever.
+- One combined P&L. **Cost of milk = real cost of production** (feed + labour +
+  vet + transport + herd depreciation ÷ kg produced) — the app tracks this.
+  The old ₹55/kg internal price is dropped (0002).
+- Dashboard shows **revenue and contribution by channel**.
+- Retail at ₹60/kg is thin once delivery is costed. At ~15 regulars it doesn't
+  cover a delivery wage — so **the operator runs the round at launch**; a paid
+  runner and any price step-up wait until retail hits ~40–50 kg/day (0006).
+
+## Capacity & growth
+
+- 50 retail households ≈ the whole herd's output — a **medium-term ceiling, not
+  a launch number**. Launch is ~15–20 households / ~20–30 kg/day.
+- Grow supply to match demand: more buffalo, or vetted third-party vendors
+  redistributed under the same quality standard. Add supply just ahead of
+  demand; never sign customers we can't supply.
+
+## The application
+
+One web app for the whole operation (0004, 0007): **Herd, Production, Breeding,
+Health, Feed, Expenses, Wholesale sales, Retail sales, Daily milk balance,
+Dashboard/financials**. Plus a **WhatsApp ordering bot** for retail.
+
+- Mobile-first, installable PWA.
+- **Roles:** Owner (all three, full access) · Delivery runner (delivery list
+  only) · Dairy hand (production + feed entry, later).
+- Stack: React + Vite + TS + Tailwind on Supabase; Meta WhatsApp Cloud API
+  (0008).
+- Built core-first for a November 2026 target, full feature set after (0009).
 
 ## Operations
 
-- **Delivery:** morning round, run by the operator at launch (hired help later).
-- **Sellers:** operator + Aman + Manjeet all bring in customers (word of mouth).
+- **Delivery:** morning round, run by the operator at launch.
+- **Sellers:** all three co-owners, word of mouth.
 - **Area:** one locality, ~50 households in reach.
-- **Launch target:** November 2026 (real trigger: dairy producing).
-- **Go / no-go gate:** do **not** expand area / hire / change price until
-  **15 regular fixed customers** are signed — target within 1 month of launch.
-- **Tooling from day one:** thin internal app (operator + delivery runner) plus
-  a WhatsApp ordering bot. No customer logins/payments in-app at launch. (0004)
+- **Gate:** no retail expansion (area / hiring / price) until **15 regular
+  fixed customers** — target within 1 month of launch.
 
 ## Open questions / risks
 
-1. **No written supply agreement.** Friends + verbal terms is the classic
-   blow-up. Need on paper: the daily kg **carve-out** reserved for retail,
-   price, notice period, and priority when halwai demand spikes and milk is
-   tight.
-2. **Cost price is a placeholder.** ₹55/kg is assumed, not agreed.
-3. **Loss-making at launch scale.** ~₹2,700/month gross at 15 regulars won't
-   cover a delivery wage. Mitigation is decided (operator delivers, price
-   step-up at ~40–50 kg/day) but the plan runs thin until volume grows.
-4. **Supply caps growth (accepted for now).** Can't exceed the herd's
-   retail carve-out until supply is expanded — more buffalo or vetted
-   third-party vendors. Grow supply just ahead of demand; vendor quality
-   vetting becomes the critical control if redistributing others' milk.
-5. **Regular-customer payment model** (prepaid vs monthly) is undecided.
-6. **Business name and legal structure** not decided (repo name "M-cli" is a
-   placeholder).
-7. **WhatsApp bot cost/setup** — real bot needs WhatsApp Business API via a
-   provider (verification + per-message cost). May start manual and switch on
-   the bot once volume justifies it.
+1. **No written co-ownership agreement.** Three-way split of ownership,
+   contributions, profit, decision-making, exit — get it on paper early.
+2. **Cost price is data-dependent.** Real cost/kg only becomes trustworthy once
+   Feed + Expenses + Production are being logged consistently.
+3. **Loss-making at launch retail scale** (accepted) — mitigation is decided
+   (operator delivers; step-up at ~40–50 kg/day).
+4. **Supply caps growth** (accepted) — expand herd or add vetted vendors ahead
+   of demand.
+5. **Regular-customer payment model** (prepaid vs monthly) undecided.
+6. **Business name / legal structure** undecided ("M-cli" is a placeholder).
+7. **Scope vs. November** — full app (0007) won't all land by launch; core-first
+   sequencing (0009) is the plan.
+8. **WhatsApp bot** needs Meta Business onboarding; may start manual.

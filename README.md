@@ -1,20 +1,31 @@
 # M-cli
 
-Retail milk delivery venture. We buy whole buffalo milk from a partner dairy
-(run separately by Aman & Manjeet) and sell it to households on daily home
-delivery — with **no commitment required** from the customer — then work to
-convert casual buyers into dependable regular customers.
+One milk business, three equal co-owners. An 8–10 buffalo herd producing
+buffalo milk, sold through two channels:
 
-This repo currently holds **decisions only**. No code yet. It exists so that
-when we start building the ordering/delivery tool, the business context and the
-choices we've already locked are written down.
+- **Wholesale** — bulk to sweet shops (halwais)
+- **Retail** — household home delivery at ₹60/kg, no monthly lock-in
 
-## Read first
+This repo is the **management application** for the whole operation — herd,
+production, breeding, health, feed, expenses, both sales channels, and combined
+financials — plus a WhatsApp ordering bot for retail customers.
 
-- [`docs/business-overview.md`](docs/business-overview.md) — the whole picture in one page
-- [`docs/decisions/`](docs/decisions/) — individual decisions, each with its reasoning and open questions
+## Layout
+
+| Path | What |
+|---|---|
+| `docs/business-overview.md` | The whole plan on one page |
+| `docs/decisions/` | Numbered decision records (0001–0009) — the authoritative history |
+| `web/` | The app — Vite + React + TS + Tailwind (see `web/README.md`) |
+| `supabase/` | Database migrations + Edge Functions |
+
+Start with [`docs/business-overview.md`](docs/business-overview.md), then
+[`docs/decisions/0007-application-spec.md`](docs/decisions/0007-application-spec.md)
+for features and [`docs/decisions/0009-build-sequence.md`](docs/decisions/0009-build-sequence.md)
+for what's being built in what order.
 
 ## Status
 
-Pre-launch. Hard gate: **we do not expand operations until 15 regular fixed
-customers are signed up.** Until then this stays deliberately small and manual.
+Pre-launch. Building **Milestone 1** (usable core) for a November 2026 target;
+full feature set follows (0009). Retail expansion is gated: no scaling area /
+hiring / price changes until **15 regular fixed customers**.

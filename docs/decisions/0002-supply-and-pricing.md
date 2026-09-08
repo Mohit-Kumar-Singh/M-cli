@@ -1,43 +1,43 @@
-# 0002 — Supply arrangement and pricing
+# 0002 — Cost of milk and pricing
 
-- **Status:** Accepted (with open items)
-- **Date:** 2026-09-07
+- **Status:** Accepted (revised 2026-09-09 — combined business)
+- **Date:** 2026-09-07, revised 2026-09-09
 
 ## Context
 
-We have no production of our own. All milk comes from Aman & Manjeet's dairy,
-whose primary customers are bulk halwai buyers. We need flexible daily
-quantities; they need their bulk business protected.
+Before the merge (0001), the retail venture "bought" milk from the dairy at an
+assumed ₹55/kg. With one combined business there is no such purchase.
 
 ## Decision
 
-**Supply**
+**Cost of milk**
 
-- The dairy **guarantees** our daily supply.
-- We keep a **15–20 kg fridge buffer** to absorb next-day demand spikes.
-- Milk we take but don't sell **flows back to the halwais**, who absorb
-  unlimited quantity — so unsold stock is not a loss. This is what makes the
-  no-commitment customer offer viable.
-- **Assumed cost: ₹55/kg** (placeholder, not yet negotiated).
+- Cost of milk = **actual cost of production per kg**, derived from the app's
+  own data: feed + labour + veterinary + transport + herd depreciation, divided
+  by kg produced over the period (see 0007 Feed / Expenses / Production
+  modules).
+- **₹55/kg is dropped as a transaction.** It may be kept only as an optional
+  internal yardstick to check the retail channel is contributing margin.
 
 **Pricing**
 
-- **₹60/kg** to the customer, home delivery included, for the **first 10 kg/day
-  per customer**.
-- Above 10 kg/day per customer: negotiated case by case.
-- **No separate delivery fee at launch.**
+- **Retail: ₹60/kg**, home delivery included, for the first 10 kg/day per
+  customer. Above that (tea stalls, small shops) — negotiated case by case.
+- **No retail delivery fee at launch.** Revisit price / add a fee once daily
+  retail volume proves out (~40–50 kg/day — see 0006).
+- **Wholesale:** per-halwai negotiated rate, recorded per customer (0007
+  Wholesale module).
 
 ## Consequences
 
-- Gross margin ≈ **₹5/kg (~8%)**. Very thin — fuel, delivery boy, packaging and
-  our time come out of that. A price increase or delivery fee is expected once
-  volume is proven; decide the trigger deliberately.
-- Buffer milk must be tracked so we know what to return to the dairy each day.
+- The app must track feed and expense data well enough to produce a real
+  cost/kg — this is not optional, it's how we know if either channel is
+  profitable.
+- Dashboard shows **contribution by channel** (revenue − attributable cost).
 
 ## Open items
 
-- [ ] **Put the supply deal in writing:** guaranteed quantity, price, notice
-      period, priority when milk is tight vs. halwai demand.
-- [ ] Confirm the real **cost per kg** (₹55 is assumed).
-- [ ] Define the **price step-up / delivery-fee trigger** (e.g. "at X kg/day"
-      or "after Y customers").
+- [ ] Decide whether to keep ₹55 as an internal yardstick or drop entirely.
+- [ ] Define how shared costs (labour, transport) are split across channels for
+      the contribution view — simple per-kg allocation to start.
+- [ ] Confirm the retail price step-up trigger in kg/day.
