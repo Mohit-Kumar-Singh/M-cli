@@ -132,6 +132,9 @@ body,
 #root {
   height: 100%;
 }
+#root {
+  min-height: 100dvh;
+}
 body {
   margin: 0;
   background: var(--surface-page);

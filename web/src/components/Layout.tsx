@@ -59,8 +59,8 @@ export default function Layout() {
   return (
     <div className="min-h-full lg:grid lg:grid-cols-[248px_1fr]">
       {/* ---- Desktop sidebar ------------------------------------------- */}
-      <aside className="hidden lg:flex flex-col border-r border-[var(--border-subtle)] bg-card sticky top-0 h-screen">
-        <div className="px-5 py-5">
+      <aside className="hidden lg:flex flex-col border-r border-[var(--border-subtle)] bg-card sticky top-0 h-[100dvh]">
+        <div className="px-5 py-5 pt-[max(1.25rem,env(safe-area-inset-top))]">
           <Wordmark />
         </div>
         <nav className="flex-1 overflow-y-auto px-3 space-y-0.5">
@@ -86,22 +86,24 @@ export default function Layout() {
       </aside>
 
       {/* ---- Mobile top bar ------------------------------------------- */}
-      <header className="lg:hidden sticky top-0 z-20 flex items-center justify-between px-4 h-14 border-b border-[var(--border-subtle)] bg-card/90 backdrop-blur">
-        <Wordmark compact />
-        <div className="flex items-center gap-1">
-          <ThemeToggle />
-          <button
-            className="mg-btn mg-btn--ghost !min-h-0 !p-2"
-            onClick={() => void signOut()}
-            aria-label="Sign out"
-          >
-            <LogOut size={18} />
-          </button>
+      <header className="lg:hidden sticky top-0 z-20 border-b border-[var(--border-subtle)] bg-card/90 backdrop-blur pt-[env(safe-area-inset-top)]">
+        <div className="flex items-center justify-between px-4 h-14">
+          <Wordmark compact />
+          <div className="flex items-center gap-1">
+            <ThemeToggle />
+            <button
+              className="mg-btn mg-btn--ghost !min-h-0 !p-2"
+              onClick={() => void signOut()}
+              aria-label="Sign out"
+            >
+              <LogOut size={18} />
+            </button>
+          </div>
         </div>
       </header>
 
       {/* ---- Content ------------------------------------------------- */}
-      <main className="px-4 sm:px-6 py-5 pb-24 lg:pb-10 max-w-3xl w-full mx-auto">
+      <main className="px-4 sm:px-6 py-5 pb-[calc(4.5rem+env(safe-area-inset-bottom))] lg:pb-10 max-w-3xl w-full mx-auto">
         <Outlet />
       </main>
 
@@ -132,7 +134,7 @@ export default function Layout() {
             className="absolute inset-0 bg-black/40"
             onClick={() => setSheetOpen(false)}
           />
-          <div className="mg-sheet-enter absolute bottom-0 inset-x-0 bg-card rounded-t-[20px] border-t border-[var(--border-subtle)] p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
+          <div className="mg-sheet-enter absolute bottom-0 inset-x-0 max-h-[80vh] overflow-y-auto bg-card rounded-t-[20px] border-t border-[var(--border-subtle)] p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
             <div className="flex items-center justify-between mb-3">
               <span className="font-display font-bold">Menu</span>
               <button

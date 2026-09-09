@@ -19,7 +19,7 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-full grid place-items-center p-4 relative overflow-hidden">
+    <div className="min-h-full grid place-items-center px-4 py-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))] relative overflow-hidden">
       <div
         className="pointer-events-none absolute inset-x-0 -top-40 h-80 blur-3xl opacity-60"
         style={{

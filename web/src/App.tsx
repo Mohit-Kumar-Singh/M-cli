@@ -17,7 +17,7 @@ import Placeholder from "./pages/Placeholder";
 
 function Splash() {
   return (
-    <div className="min-h-full grid place-items-center gap-3">
+    <div className="min-h-full grid place-items-center p-4">
       <div className="flex flex-col items-center gap-3 text-ink-mute">
         <Wordmark />
         <Spinner size={18} />

@@ -15,11 +15,11 @@ export function DateStepper({ value, onChange, min, max, className = "" }: Props
   const nextDisabled = max != null && value >= max;
   return (
     <div
-      className={`mg-card flex items-center gap-1 p-1.5 pr-3 ${className}`}
+      className={`mg-card flex items-center gap-1 p-1.5 pr-2.5 ${className}`}
       style={{ boxShadow: "none" }}
     >
       <button
-        className="mg-btn mg-btn--ghost !min-h-0 !p-1.5"
+        className="mg-btn mg-btn--ghost !min-h-0 !p-1.5 shrink-0"
         onClick={() => onChange(addDays(value, -1))}
         disabled={prevDisabled}
         aria-label="Previous day"
@@ -28,21 +28,21 @@ export function DateStepper({ value, onChange, min, max, className = "" }: Props
       </button>
       <input
         type="date"
-        className="mg-input !border-0 !bg-transparent !px-1 !py-1 w-[9.5rem] focus:!shadow-none"
+        className="mg-input !border-0 !bg-transparent !px-1 !py-1 min-w-0 flex-1 max-w-[9.5rem] focus:!shadow-none"
         value={value}
         min={min}
         max={max}
         onChange={(e) => e.target.value && onChange(e.target.value)}
       />
       <button
-        className="mg-btn mg-btn--ghost !min-h-0 !p-1.5"
+        className="mg-btn mg-btn--ghost !min-h-0 !p-1.5 shrink-0"
         onClick={() => onChange(addDays(value, 1))}
         disabled={nextDisabled}
         aria-label="Next day"
       >
         <ChevronRight size={18} />
       </button>
-      <span className="ml-auto text-[13px] text-ink-mute whitespace-nowrap">
+      <span className="ml-auto pl-1 text-[12px] text-ink-mute whitespace-nowrap shrink-0">
         {prettyDate(value)}
       </span>
     </div>
