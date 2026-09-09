@@ -42,9 +42,9 @@ const NAV: Item[] = [
   { to: "/deliveries", label: "Deliveries", icon: Truck, roles: ["owner", "delivery_runner"], primary: true },
   { to: "/wholesale", label: "Wholesale", icon: Store, roles: ["owner"] },
   { to: "/balance", label: "Milk balance", icon: Scale, roles: ["owner"] },
-  { to: "/feed", label: "Feed", icon: Wheat, roles: ["owner", "dairy_hand"], soon: "Soon" },
-  { to: "/expenses", label: "Expenses", icon: Receipt, roles: ["owner"], soon: "Soon" },
-  { to: "/health", label: "Health", icon: Stethoscope, roles: ["owner"], soon: "Soon" },
+  { to: "/feed", label: "Feed", icon: Wheat, roles: ["owner", "dairy_hand"] },
+  { to: "/expenses", label: "Expenses", icon: Receipt, roles: ["owner"] },
+  { to: "/health", label: "Health", icon: Stethoscope, roles: ["owner"] },
   { to: "/breeding", label: "Breeding", icon: Sprout, roles: ["owner"], soon: "Soon" },
   {
     to: "/settings",

@@ -133,5 +133,105 @@ export interface DailyBalance {
   notes: string | null;
 }
 
-// A typed `Database` interface will replace these once generated from the
-// live Supabase project (see src/lib/supabase.ts).
+// ---------------------------------------------------------------------------
+// Milestone 2 — Feed, Expenses, Health (migration 0002)
+// ---------------------------------------------------------------------------
+export type FeedCategory =
+  | "green_fodder"
+  | "dry_fodder"
+  | "concentrate"
+  | "mineral"
+  | "other";
+export type FeedScope = "herd" | "group" | "animal";
+export type ExpenseCategory =
+  | "labour"
+  | "electricity"
+  | "water"
+  | "equipment"
+  | "maintenance"
+  | "transport"
+  | "vet"
+  | "feed"
+  | "rent"
+  | "misc";
+export type ExpenseCadence = "weekly" | "monthly";
+export type HealthScope = "animal" | "herd";
+export type HealthEventType =
+  | "vaccination"
+  | "deworming"
+  | "illness"
+  | "treatment"
+  | "vet_visit"
+  | "injury";
+
+export interface FeedItem {
+  id: string;
+  name: string;
+  category: FeedCategory;
+  unit: string;
+  current_stock: number;
+  notes: string | null;
+  created_at: string;
+}
+
+export interface FeedPurchase {
+  id: string;
+  date: string;
+  feed_item_id: string;
+  qty: number;
+  cost: number;
+  supplier: string | null;
+  notes: string | null;
+  created_at: string;
+}
+
+export interface FeedConsumption {
+  id: string;
+  date: string;
+  feed_item_id: string;
+  qty: number;
+  scope: FeedScope;
+  animal_id: string | null;
+  notes: string | null;
+  created_at: string;
+}
+
+export interface Expense {
+  id: string;
+  date: string;
+  category: ExpenseCategory;
+  amount: number;
+  paid_to: string | null;
+  payment_method: PaymentMethod;
+  linked_ref: string | null;
+  notes: string | null;
+  created_at: string;
+}
+
+export interface ExpenseTemplate {
+  id: string;
+  label: string;
+  category: ExpenseCategory;
+  amount: number;
+  cadence: ExpenseCadence;
+  active: boolean;
+  notes: string | null;
+  created_at: string;
+}
+
+export interface HealthEvent {
+  id: string;
+  scope: HealthScope;
+  animal_id: string | null;
+  event_type: HealthEventType;
+  event_date: string;
+  product_used: string | null;
+  dose: string | null;
+  milk_withdrawal_until: string | null;
+  meat_withdrawal_until: string | null;
+  cost: number;
+  vet_name: string | null;
+  next_due_date: string | null;
+  notes: string | null;
+  created_at: string;
+}

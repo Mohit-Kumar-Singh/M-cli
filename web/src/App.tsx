@@ -13,6 +13,9 @@ import RetailOrders from "./pages/RetailOrders";
 import Deliveries from "./pages/Deliveries";
 import Wholesale from "./pages/Wholesale";
 import Balance from "./pages/Balance";
+import Feed from "./pages/Feed";
+import Expenses from "./pages/Expenses";
+import Health from "./pages/Health";
 import Settings from "./pages/Settings";
 import Placeholder from "./pages/Placeholder";
 
@@ -48,50 +51,9 @@ function Gate() {
         <Route path="wholesale" element={<Wholesale />} />
         <Route path="balance" element={<Balance />} />
         <Route path="settings" element={<Settings />} />
-        <Route
-          path="feed"
-          element={
-            <Placeholder
-              title="Feed & inputs"
-              milestone="Milestone 2"
-              spec="0007 · Module 5"
-              points={[
-                "Feed items and stock on hand",
-                "Purchases — quantity, cost, supplier",
-                "Daily consumption, rolled up to feed cost per kg of milk",
-              ]}
-            />
-          }
-        />
-        <Route
-          path="expenses"
-          element={
-            <Placeholder
-              title="Expenses"
-              milestone="Milestone 2"
-              spec="0007 · Module 6"
-              points={[
-                "Categorised non-feed expenses",
-                "Recurring templates for wages and electricity",
-              ]}
-            />
-          }
-        />
-        <Route
-          path="health"
-          element={
-            <Placeholder
-              title="Health & veterinary"
-              milestone="Milestone 2"
-              spec="0007 · Module 4"
-              points={[
-                "Vaccination and deworming schedule",
-                "Treatments and cost, flowing into Expenses",
-                "Milk-withdrawal periods that feed the daily balance",
-              ]}
-            />
-          }
-        />
+        <Route path="feed" element={<Feed />} />
+        <Route path="expenses" element={<Expenses />} />
+        <Route path="health" element={<Health />} />
         <Route
           path="breeding"
           element={

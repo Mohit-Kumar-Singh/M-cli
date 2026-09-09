@@ -3,31 +3,53 @@ import { supabase, supabaseConfigured } from "../lib/supabase";
 import { isoDate } from "../lib/dates";
 import { PageHeader, StatTile, Card } from "../ui";
 
-interface Counts {
+interface Stats {
   animals: number | null;
   milking: number | null;
   retail: number | null;
   regulars: number | null;
-  producedToday: number | null;
+  producedToday: number;
+  producedMonth: number;
+  revenueMonth: number;
+  spendMonth: number;
 }
 
 const REGULAR_TARGET = 15; // docs/decisions/0005
+const EMPTY: Stats = {
+  animals: null,
+  milking: null,
+  retail: null,
+  regulars: null,
+  producedToday: 0,
+  producedMonth: 0,
+  revenueMonth: 0,
+  spendMonth: 0,
+};
 
 export default function Dashboard() {
-  const [c, setC] = useState<Counts>({
-    animals: null,
-    milking: null,
-    retail: null,
-    regulars: null,
-    producedToday: null,
-  });
+  const [s, setS] = useState<Stats>(EMPTY);
   const [loading, setLoading] = useState(supabaseConfigured);
 
   useEffect(() => {
     if (!supabaseConfigured) return;
     void (async () => {
       const today = isoDate();
-      const [animals, milking, retail, regulars, prod] = await Promise.all([
+      const monthStart = today.slice(0, 8) + "01";
+      const sum = <T,>(rows: T[] | null, pick: (r: T) => number) =>
+        (rows ?? []).reduce((acc, r) => acc + Number(pick(r)), 0);
+
+      const [
+        animals,
+        milking,
+        retail,
+        regulars,
+        prodToday,
+        prodMonth,
+        rtMonth,
+        whMonth,
+        exMonth,
+        feedMonth,
+      ] = await Promise.all([
         supabase.from("animals").select("id", { count: "exact", head: true }),
         supabase
           .from("animals")
@@ -43,29 +65,48 @@ export default function Dashboard() {
           .eq("type", "regular")
           .eq("status", "active"),
         supabase.from("milk_production").select("qty_kg").eq("date", today),
+        supabase.from("milk_production").select("qty_kg").gte("date", monthStart),
+        supabase
+          .from("retail_orders")
+          .select("amount_collected")
+          .gte("delivery_date", monthStart)
+          .eq("status", "delivered")
+          .eq("paid", true),
+        supabase
+          .from("wholesale_deliveries")
+          .select("amount")
+          .gte("date", monthStart),
+        supabase.from("expenses").select("amount").gte("date", monthStart),
+        supabase.from("feed_purchases").select("cost").gte("date", monthStart),
       ]);
-      setC({
+
+      setS({
         animals: animals.count,
         milking: milking.count,
         retail: retail.count,
         regulars: regulars.count,
-        producedToday: (prod.data ?? []).reduce(
-          (s: number, r: { qty_kg: number }) => s + Number(r.qty_kg),
-          0,
-        ),
+        producedToday: sum(prodToday.data, (r: { qty_kg: number }) => r.qty_kg),
+        producedMonth: sum(prodMonth.data, (r: { qty_kg: number }) => r.qty_kg),
+        revenueMonth:
+          sum(rtMonth.data, (r: { amount_collected: number | null }) => r.amount_collected ?? 0) +
+          sum(whMonth.data, (r: { amount: number }) => r.amount),
+        spendMonth:
+          sum(exMonth.data, (r: { amount: number }) => r.amount) +
+          sum(feedMonth.data, (r: { cost: number }) => r.cost),
       });
       setLoading(false);
     })();
   }, []);
 
-  const regulars = c.regulars ?? 0;
+  const regulars = s.regulars ?? 0;
   const pct = Math.min(100, Math.round((regulars / REGULAR_TARGET) * 100));
+  const costPerKg = s.producedMonth > 0 ? s.spendMonth / s.producedMonth : null;
 
   return (
     <div>
       <PageHeader
         title="Dashboard"
-        subtitle="A quick read on the herd and today's round."
+        subtitle="A quick read on the herd and this month."
       />
 
       {!supabaseConfigured && (
@@ -78,15 +119,43 @@ export default function Dashboard() {
       )}
 
       <div className="grid grid-cols-2 gap-3">
-        <StatTile label="Milk produced today" loading={loading} tone="accent"
-          value={`${(c.producedToday ?? 0).toFixed(1)} kg`}
-          sub="across both sessions" />
-        <StatTile label="Milking animals" loading={loading}
-          value={c.milking ?? 0} sub={`of ${c.animals ?? 0} in the herd`} />
-        <StatTile label="Active retail customers" loading={loading}
-          value={c.retail ?? 0} />
-        <StatTile label="Regular customers" loading={loading}
-          value={regulars} sub={`target ${REGULAR_TARGET}`} />
+        <StatTile
+          label="Milk produced today"
+          loading={loading}
+          tone="accent"
+          value={`${s.producedToday.toFixed(1)} kg`}
+          sub="across both sessions"
+        />
+        <StatTile
+          label="Milking animals"
+          loading={loading}
+          value={s.milking ?? 0}
+          sub={`of ${s.animals ?? 0} in the herd`}
+        />
+        <StatTile
+          label="Revenue this month"
+          loading={loading}
+          value={`₹${Math.round(s.revenueMonth).toLocaleString("en-IN")}`}
+          sub="retail + wholesale"
+        />
+        <StatTile
+          label="Spend this month"
+          loading={loading}
+          value={`₹${Math.round(s.spendMonth).toLocaleString("en-IN")}`}
+          sub="feed + expenses"
+        />
+        <StatTile
+          label="Cost per kg (month)"
+          loading={loading}
+          value={costPerKg == null ? "—" : `₹${costPerKg.toFixed(1)}`}
+          sub={`${s.producedMonth.toFixed(0)} kg produced`}
+        />
+        <StatTile
+          label="Regular customers"
+          loading={loading}
+          value={regulars}
+          sub={`target ${REGULAR_TARGET}`}
+        />
       </div>
 
       <Card className="mt-3">
@@ -108,8 +177,8 @@ export default function Dashboard() {
       </Card>
 
       <p className="text-[12px] text-ink-mute mt-4">
-        Revenue and cost-per-kg summaries arrive with the Feed and Expenses
-        modules.
+        “Cost per kg” is this month’s feed + expenses over kg produced — it firms
+        up as those are logged consistently.
       </p>
     </div>
   );

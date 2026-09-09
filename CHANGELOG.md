@@ -4,6 +4,21 @@ Milk Garage web app. Versions are `web/package.json` + a matching `vX.Y.Z` git
 tag, bumped on every user-visible push (see `docs/decisions/0010-versioning.md`).
 The running version is shown in the app (sidebar, "More" sheet, sign-in screen).
 
+## v0.5.0 — 2026-09-09 — Milestone 2: depth
+
+- **Feed & inputs**: feed items with live stock, purchase and consumption
+  entry (stock auto-adjusts via DB triggers), recent movements, month spend.
+- **Expenses**: categorised expense log, month total + per-category breakdown,
+  recurring templates with one-tap "post this month".
+- **Health & veterinary**: event log (vaccination / deworming / illness /
+  treatment / vet visit / injury), vaccination schedule with overdue flags,
+  active milk-withdrawal list. A cost on an event auto-creates a "vet" expense.
+- **Daily milk balance** now subtracts milk under vet withdrawal from the
+  sellable total (`withdrawn_milk_kg` DB function).
+- **Dashboard**: revenue this month, spend this month, and cost per kg
+  (feed + expenses ÷ kg produced).
+- Migration `0002`; RLS verified (owner full, dairy_hand → feed only).
+
 ## v0.4.0 — 2026-09-09
 
 - New **Settings** screen (`/settings`): Account (name, email, role, sign out),

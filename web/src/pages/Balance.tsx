@@ -6,13 +6,22 @@ import { PageHeader, Button, Card, Field, Input, DateStepper, Skeleton } from ".
 
 interface Computed {
   produced: number;
+  withheld: number;
   wholesale: number;
   retail: number;
   cash: number;
   upi: number;
   unpaid: number;
 }
-const ZERO: Computed = { produced: 0, wholesale: 0, retail: 0, cash: 0, upi: 0, unpaid: 0 };
+const ZERO: Computed = {
+  produced: 0,
+  withheld: 0,
+  wholesale: 0,
+  retail: 0,
+  cash: 0,
+  upi: 0,
+  unpaid: 0,
+};
 
 export default function Balance() {
   const [date, setDate] = useState(isoDate());
@@ -30,7 +39,7 @@ export default function Balance() {
     if (!supabaseConfigured) return setLoading(false);
     setLoading(true);
     setMsg(null);
-    const [prodRes, whRes, rtRes, balRes] = await Promise.all([
+    const [prodRes, whRes, rtRes, balRes, wdRes] = await Promise.all([
       supabase.from("milk_production").select("qty_kg").eq("date", date),
       supabase.from("wholesale_deliveries").select("*").eq("date", date),
       supabase
@@ -39,12 +48,14 @@ export default function Balance() {
         .eq("delivery_date", date)
         .eq("status", "delivered"),
       supabase.from("daily_balance").select("*").eq("date", date).maybeSingle(),
+      supabase.rpc("withdrawn_milk_kg", { on_date: date }),
     ]);
 
     const produced = ((prodRes.data ?? []) as Pick<MilkProduction, "qty_kg">[]).reduce(
       (s, r) => s + Number(r.qty_kg),
       0,
     );
+    const withheld = Number(wdRes.data ?? 0);
     const wh = (whRes.data ?? []) as WholesaleDelivery[];
     const rt = (rtRes.data ?? []) as RetailOrder[];
 
@@ -66,6 +77,7 @@ export default function Balance() {
 
     setC({
       produced,
+      withheld,
       wholesale: wh.reduce((s, d) => s + Number(d.qty_kg), 0),
       retail: rt.reduce((s, o) => s + Number(o.delivered_qty_kg ?? 0), 0),
       cash,
@@ -87,9 +99,10 @@ export default function Balance() {
   }, [load]);
 
   const n = (s: string) => parseFloat(s) || 0;
+  const sellable = Math.max(0, c.produced - c.withheld);
   const bufferDelta = n(bufEnd) - n(bufStart);
   const accounted = c.wholesale + c.retail + n(ownUse) + n(wastage) + bufferDelta;
-  const unaccounted = c.produced - accounted;
+  const unaccounted = sellable - accounted;
 
   async function save() {
     setSaving(true);
@@ -97,7 +110,7 @@ export default function Balance() {
     const { error } = await supabase.from("daily_balance").upsert({
       date,
       produced_kg: c.produced,
-      sellable_kg: c.produced, // withdrawal handling arrives with the Health module
+      sellable_kg: sellable, // produced minus milk under vet withdrawal (Health)
       wholesale_kg: c.wholesale,
       retail_kg: c.retail,
       own_use_kg: n(ownUse),
@@ -133,6 +146,12 @@ export default function Balance() {
               <Metric k="To wholesale" v={`${c.wholesale.toFixed(1)}`} unit="kg" />
               <Metric k="To retail" v={`${c.retail.toFixed(1)}`} unit="kg" />
             </div>
+            {c.withheld > 0 && (
+              <p className="text-[12px] text-ink-mute mt-3 pt-3 border-t border-[var(--border-subtle)]">
+                {c.withheld.toFixed(1)} kg under vet withdrawal · sellable{" "}
+                <span className="font-semibold text-ink tnum">{sellable.toFixed(1)} kg</span>
+              </p>
+            )}
           </Card>
 
           <Card>
