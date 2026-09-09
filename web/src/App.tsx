@@ -7,6 +7,7 @@ import { Spinner } from "./ui";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Herd from "./pages/Herd";
+import AnimalDetail from "./pages/AnimalDetail";
 import Production from "./pages/Production";
 import RetailCustomers from "./pages/RetailCustomers";
 import RetailOrders from "./pages/RetailOrders";
@@ -44,6 +45,7 @@ function Gate() {
       <Route element={<Layout />}>
         <Route index element={<Dashboard />} />
         <Route path="herd" element={<Herd />} />
+        <Route path="herd/:id" element={<AnimalDetail />} />
         <Route path="production" element={<Production />} />
         <Route path="retail" element={<RetailCustomers />} />
         <Route path="retail/orders" element={<RetailOrders />} />

@@ -307,6 +307,108 @@ function CustomerForm({
           Save customer
         </Button>
       </form>
+
+      {initial && type === "regular" && (
+        <div className="mt-4 pt-4 border-t border-[var(--border-subtle)]">
+          <Pauses customerId={initial.id} />
+        </div>
+      )}
     </Card>
+  );
+}
+
+interface Pause {
+  id: string;
+  date_from: string;
+  date_to: string;
+  reason: string | null;
+}
+
+function Pauses({ customerId }: { customerId: string }) {
+  const [rows, setRows] = useState<Pause[]>([]);
+  const [from, setFrom] = useState(isoDate());
+  const [to, setTo] = useState(isoDate());
+  const [reason, setReason] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function load() {
+    const { data } = await supabase
+      .from("retail_pauses")
+      .select("id, date_from, date_to, reason")
+      .eq("customer_id", customerId)
+      .gte("date_to", isoDate())
+      .order("date_from");
+    setRows((data ?? []) as Pause[]);
+  }
+  useEffect(() => {
+    void load();
+  }, [customerId]);
+
+  async function add() {
+    if (to < from) return setError("End date is before the start date.");
+    setBusy(true);
+    setError(null);
+    const { error } = await supabase.from("retail_pauses").insert({
+      customer_id: customerId,
+      date_from: from,
+      date_to: to,
+      created_via: "manual",
+      reason: reason.trim() || null,
+    });
+    setBusy(false);
+    if (error) setError(error.message);
+    else {
+      setReason("");
+      void load();
+    }
+  }
+
+  async function remove(id: string) {
+    await supabase.from("retail_pauses").delete().eq("id", id);
+    void load();
+  }
+
+  return (
+    <div className="space-y-2">
+      <div className="text-[13px] font-semibold text-ink-soft">Upcoming pauses</div>
+      {rows.length === 0 ? (
+        <p className="text-[12px] text-ink-mute">None scheduled.</p>
+      ) : (
+        <ul className="space-y-1.5">
+          {rows.map((p) => (
+            <li key={p.id} className="flex items-center justify-between gap-2 text-[13px]">
+              <span className="tnum">
+                {p.date_from}
+                {p.date_to !== p.date_from ? ` → ${p.date_to}` : ""}
+                {p.reason ? <span className="text-ink-mute"> · {p.reason}</span> : null}
+              </span>
+              <button
+                type="button"
+                className="text-[12px] text-danger"
+                onClick={() => void remove(p.id)}
+              >
+                Remove
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+      <div className="grid grid-cols-2 gap-2 pt-1">
+        <Field label="From">
+          {(id) => <Input id={id} type="date" value={from} onChange={(e) => setFrom(e.target.value)} />}
+        </Field>
+        <Field label="To">
+          {(id) => <Input id={id} type="date" value={to} onChange={(e) => setTo(e.target.value)} />}
+        </Field>
+        <Field label="Reason" className="col-span-2">
+          {(id) => <Input id={id} value={reason} onChange={(e) => setReason(e.target.value)} />}
+        </Field>
+      </div>
+      {error && <p className="text-[12px] text-danger">{error}</p>}
+      <Button type="button" size="sm" variant="secondary" loading={busy} onClick={() => void add()}>
+        Add pause
+      </Button>
+    </div>
   );
 }

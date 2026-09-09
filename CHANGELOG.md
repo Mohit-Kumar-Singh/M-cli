@@ -4,6 +4,14 @@ Milk Garage web app. Versions are `web/package.json` + a matching `vX.Y.Z` git
 tag, bumped on every user-visible push (see `docs/decisions/0010-versioning.md`).
 The running version is shown in the app (sidebar, "More" sheet, sign-in screen).
 
+## v0.6.0 — 2026-09-09 — Milestone 1 leftovers
+
+- **Animal detail** (`/herd/:id`): identity, edit, 30-day production history,
+  per-animal health log, and a "mark sold / died" flow (date, reason, sale
+  amount). Herd rows are now tappable.
+- **Retail pauses UI**: on a regular customer, an "Upcoming pauses" section to
+  add / remove pause date-ranges (previously only settable via the DB).
+
 ## v0.5.0 — 2026-09-09 — Milestone 2: depth
 
 - **Feed & inputs**: feed items with live stock, purchase and consumption

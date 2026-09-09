@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { Plus, PawPrint } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Plus, PawPrint, ChevronRight } from "lucide-react";
 import { supabase, supabaseConfigured } from "../lib/supabase";
 import type { Animal, AnimalStatus } from "../types/db";
 import {
@@ -126,7 +127,11 @@ export default function Herd() {
       ) : (
         <ListCard>
           {shown.map((a) => (
-            <div key={a.id} className="flex items-center justify-between gap-3 p-3.5">
+            <Link
+              key={a.id}
+              to={a.id}
+              className="flex items-center justify-between gap-3 p-3.5 hover:bg-sunken transition-colors"
+            >
               <div className="min-w-0">
                 <div className="font-medium text-ink truncate">
                   {a.tag_no}
@@ -137,8 +142,11 @@ export default function Herd() {
                   {a.lactation_number ? ` · lactation ${a.lactation_number}` : ""}
                 </div>
               </div>
-              <Badge tone={STATUS_TONE[a.status]}>{a.status}</Badge>
-            </div>
+              <div className="flex items-center gap-1.5 shrink-0">
+                <Badge tone={STATUS_TONE[a.status]}>{a.status}</Badge>
+                <ChevronRight size={16} className="text-ink-mute" />
+              </div>
+            </Link>
           ))}
         </ListCard>
       )}
