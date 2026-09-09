@@ -4,6 +4,17 @@ Milk Garage web app. Versions are `web/package.json` + a matching `vX.Y.Z` git
 tag, bumped on every user-visible push (see `docs/decisions/0010-versioning.md`).
 The running version is shown in the app (sidebar, "More" sheet, sign-in screen).
 
+## v0.7.0 — 2026-09-09 — Milestone 3: Breeding
+
+- **Breeding & reproduction** screen: log heat / service / pregnancy check /
+  calving / dry-off / abortion. A service auto-sets expected calving at
+  +310 days; a positive PD marks the dam pregnant; a calving bumps her
+  lactation number, sets her back to milking, and (optionally) registers the
+  calf as a heifer with the dam linked. Upcoming-calvings list with dry-off
+  dates.
+- Migration `0003`; RLS + triggers verified.
+- Placeholder screens removed — every nav item is now live.
+
 ## v0.6.0 — 2026-09-09 — Milestone 1 leftovers
 
 - **Animal detail** (`/herd/:id`): identity, edit, 30-day production history,

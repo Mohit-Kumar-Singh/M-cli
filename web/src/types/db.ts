@@ -235,3 +235,30 @@ export interface HealthEvent {
   notes: string | null;
   created_at: string;
 }
+
+// ---------------------------------------------------------------------------
+// Milestone 3 — Breeding (migration 0003)
+// ---------------------------------------------------------------------------
+export type BreedingEventType =
+  | "heat"
+  | "service"
+  | "pregnancy_check"
+  | "calving"
+  | "dry_off"
+  | "abortion";
+export type BreedingMethod = "ai" | "natural";
+export type PdResult = "positive" | "negative" | "unknown";
+
+export interface BreedingEvent {
+  id: string;
+  animal_id: string;
+  event_type: BreedingEventType;
+  event_date: string;
+  method: BreedingMethod | null;
+  sire_ref: string | null;
+  pd_result: PdResult | null;
+  expected_calving_date: string | null;
+  calf_animal_id: string | null;
+  notes: string | null;
+  created_at: string;
+}

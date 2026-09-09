@@ -45,7 +45,7 @@ const NAV: Item[] = [
   { to: "/feed", label: "Feed", icon: Wheat, roles: ["owner", "dairy_hand"] },
   { to: "/expenses", label: "Expenses", icon: Receipt, roles: ["owner"] },
   { to: "/health", label: "Health", icon: Stethoscope, roles: ["owner"] },
-  { to: "/breeding", label: "Breeding", icon: Sprout, roles: ["owner"], soon: "Soon" },
+  { to: "/breeding", label: "Breeding", icon: Sprout, roles: ["owner"] },
   {
     to: "/settings",
     label: "Settings",

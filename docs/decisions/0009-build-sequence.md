@@ -31,23 +31,27 @@ lands first. November 2026 is the aim for **Milestone 1**; the full feature set
 - ✅ **Wholesale sales** — customers with running dues, daily dispatch entry.
 - ✅ **Daily milk balance** — computed produced/wholesale/retail + entered
   own-use/wastage/buffer, unaccounted-kg check, cash/UPI/unpaid.
-- ◑ **Dashboard** — live counts done; milk/money rollups still to add.
-- ⬜ Animal detail page, retail pause management UI, conversion-candidates view.
+- ✅ **Dashboard** — counts + revenue / spend / cost-per-kg this month (v0.5.0).
+- ✅ **Animal detail** page with edit + dispose; **retail pause** UI (v0.6.0).
+- ⬜ Conversion-candidates view.
 
-## Milestone 2 — Depth
+## Milestone 2 — Depth ✅ (v0.5.0)
 
-- **Feed** — items, purchases, consumption, cost/kg-milk.
-- **Expenses** — categorized, recurring templates.
-- **Health** — log, vaccination schedule, withdrawal periods feeding the daily
-  balance.
-- **Financials** — cost/kg, contribution by channel, receivables.
+- ✅ **Feed** — items, purchases, consumption (trigger-kept stock), month spend.
+- ✅ **Expenses** — categorized log, month breakdown, recurring templates.
+- ✅ **Health** — log, vaccination schedule w/ overdue flags, withdrawal list
+  feeding `withdrawn_milk_kg()` → the daily balance's sellable total.
+- ◑ **Financials** — cost/kg on the dashboard done; contribution-by-channel
+  and a receivables page still to do.
 
 ## Milestone 3 — Breeding & automation
 
-- **Breeding** — events, calving → new herd record, calendar, dry-off
-  reminders.
-- **WhatsApp bot** — order + pause via Meta Cloud API webhook.
-- **Nightly cutoff job** — freeze tomorrow's list, generate standing orders.
+- ✅ **Breeding** (v0.7.0) — events, +310d expected calving, calving bumps
+  lactation + registers the calf, upcoming/dry-off list. Migration `0003`.
+- ⬜ **WhatsApp bot** — order + pause via Meta Cloud API webhook (needs Meta
+  Business onboarding).
+- ⬜ **Nightly cutoff job** — Edge Function + cron: freeze tomorrow's list,
+  generate standing orders.
 
 ## Milestone 4 — Customer-facing & offline
 

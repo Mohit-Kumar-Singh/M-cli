@@ -17,8 +17,8 @@ import Balance from "./pages/Balance";
 import Feed from "./pages/Feed";
 import Expenses from "./pages/Expenses";
 import Health from "./pages/Health";
+import Breeding from "./pages/Breeding";
 import Settings from "./pages/Settings";
-import Placeholder from "./pages/Placeholder";
 
 function Splash() {
   return (
@@ -56,21 +56,7 @@ function Gate() {
         <Route path="feed" element={<Feed />} />
         <Route path="expenses" element={<Expenses />} />
         <Route path="health" element={<Health />} />
-        <Route
-          path="breeding"
-          element={
-            <Placeholder
-              title="Breeding & reproduction"
-              milestone="Milestone 3"
-              spec="0007 · Module 3"
-              points={[
-                "Heat, service, pregnancy check, calving and dry-off events",
-                "Calving creates the calf's herd record and bumps lactation number",
-                "Calendar of upcoming calvings and due dry-offs",
-              ]}
-            />
-          }
-        />
+        <Route path="breeding" element={<Breeding />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>
