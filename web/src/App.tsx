@@ -13,6 +13,7 @@ import RetailOrders from "./pages/RetailOrders";
 import Deliveries from "./pages/Deliveries";
 import Wholesale from "./pages/Wholesale";
 import Balance from "./pages/Balance";
+import Settings from "./pages/Settings";
 import Placeholder from "./pages/Placeholder";
 
 function Splash() {
@@ -46,6 +47,7 @@ function Gate() {
         <Route path="deliveries" element={<Deliveries />} />
         <Route path="wholesale" element={<Wholesale />} />
         <Route path="balance" element={<Balance />} />
+        <Route path="settings" element={<Settings />} />
         <Route
           path="feed"
           element={

@@ -16,6 +16,7 @@ import {
   Menu,
   X,
   LogOut,
+  Settings as SettingsIcon,
 } from "lucide-react";
 import { useAuth } from "../lib/auth";
 import type { Role } from "../types/db";
@@ -45,6 +46,12 @@ const NAV: Item[] = [
   { to: "/expenses", label: "Expenses", icon: Receipt, roles: ["owner"], soon: "Soon" },
   { to: "/health", label: "Health", icon: Stethoscope, roles: ["owner"], soon: "Soon" },
   { to: "/breeding", label: "Breeding", icon: Sprout, roles: ["owner"], soon: "Soon" },
+  {
+    to: "/settings",
+    label: "Settings",
+    icon: SettingsIcon,
+    roles: ["owner", "delivery_runner", "dairy_hand"],
+  },
 ];
 
 export default function Layout() {
@@ -95,13 +102,15 @@ export default function Layout() {
           <Wordmark compact />
           <div className="flex items-center gap-1">
             <ThemeToggle />
-            <button
-              className="mg-btn mg-btn--ghost !min-h-0 !p-2"
-              onClick={() => void signOut()}
-              aria-label="Sign out"
+            <NavLink
+              to="/settings"
+              className={({ isActive }) =>
+                `mg-btn mg-btn--ghost !min-h-0 !p-2 ${isActive ? "!text-accent" : ""}`
+              }
+              aria-label="Settings"
             >
-              <LogOut size={18} />
-            </button>
+              <SettingsIcon size={18} />
+            </NavLink>
           </div>
         </div>
       </header>

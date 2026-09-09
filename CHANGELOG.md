@@ -4,6 +4,15 @@ Milk Garage web app. Versions are `web/package.json` + a matching `vX.Y.Z` git
 tag, bumped on every user-visible push (see `docs/decisions/0010-versioning.md`).
 The running version is shown in the app (sidebar, "More" sheet, sign-in screen).
 
+## v0.4.0 — 2026-09-09
+
+- New **Settings** screen (`/settings`): Account (name, email, role, sign out),
+  Appearance (System / Light / Dark theme picker), About (app version, commit,
+  build date, "Reload app"). Reachable from a gear in the mobile top bar, the
+  desktop sidebar, and the "More" sheet.
+- Version is now shown in the phone app in Settings › About as well as the
+  "More" sheet.
+
 ## v0.3.0 — 2026-09-09
 
 - Show the build version (`vX.Y.Z`, with commit SHA + build date on hover) in
