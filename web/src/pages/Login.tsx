@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { supabase, supabaseConfigured } from "../lib/supabase";
 import { Button, TextField } from "../ui";
 import { Wordmark } from "../components/Wordmark";
+import { AppVersion } from "../components/AppVersion";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -68,6 +69,10 @@ export default function Login() {
             Sign in
           </Button>
         </form>
+
+        <div className="mt-5 pt-4 border-t border-[var(--border-subtle)] text-center">
+          <AppVersion />
+        </div>
       </div>
     </div>
   );

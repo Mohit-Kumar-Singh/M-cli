@@ -20,6 +20,7 @@ import {
 import { useAuth } from "../lib/auth";
 import type { Role } from "../types/db";
 import { Wordmark } from "./Wordmark";
+import { AppVersion } from "./AppVersion";
 import { ThemeToggle } from "../ui";
 
 interface Item {
@@ -68,20 +69,23 @@ export default function Layout() {
             <SideLink key={i.to} item={i} />
           ))}
         </nav>
-        <div className="border-t border-[var(--border-subtle)] p-3 flex items-center gap-2">
-          <div className="min-w-0 flex-1">
-            <div className="text-[13px] font-medium truncate">{profile?.full_name ?? "—"}</div>
-            <div className="text-[11px] text-ink-mute capitalize">{role?.replace("_", " ")}</div>
+        <div className="border-t border-[var(--border-subtle)] p-3 space-y-2">
+          <div className="flex items-center gap-2">
+            <div className="min-w-0 flex-1">
+              <div className="text-[13px] font-medium truncate">{profile?.full_name ?? "—"}</div>
+              <div className="text-[11px] text-ink-mute capitalize">{role?.replace("_", " ")}</div>
+            </div>
+            <ThemeToggle />
+            <button
+              className="mg-btn mg-btn--ghost !min-h-0 !p-2"
+              onClick={() => void signOut()}
+              aria-label="Sign out"
+              title="Sign out"
+            >
+              <LogOut size={18} />
+            </button>
           </div>
-          <ThemeToggle />
-          <button
-            className="mg-btn mg-btn--ghost !min-h-0 !p-2"
-            onClick={() => void signOut()}
-            aria-label="Sign out"
-            title="Sign out"
-          >
-            <LogOut size={18} />
-          </button>
+          <AppVersion className="block px-1" />
         </div>
       </aside>
 
@@ -164,6 +168,10 @@ export default function Layout() {
                   {i.soon && <span className="mg-badge mg-badge--neutral !py-0 !text-[9px]">{i.soon}</span>}
                 </NavLink>
               ))}
+            </div>
+            <div className="mt-4 pt-3 border-t border-[var(--border-subtle)] flex items-center justify-between">
+              <AppVersion />
+              <span className="text-[11px] text-ink-mute">{profile?.full_name ?? ""}</span>
             </div>
           </div>
         </div>
