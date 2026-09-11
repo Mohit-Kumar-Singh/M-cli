@@ -249,6 +249,20 @@ export type BreedingEventType =
 export type BreedingMethod = "ai" | "natural";
 export type PdResult = "positive" | "negative" | "unknown";
 
+// ---------------------------------------------------------------------------
+// Milestone 4 — Customer portal (migration 0004/0005)
+// ---------------------------------------------------------------------------
+export interface CustomerProfile {
+  id: string;
+  name: string;
+  phone: string | null;
+  area: string | null;
+  type: RetailCustomerType;
+  fixed_daily_qty_kg: number | null;
+  price_per_kg: number;
+  payment_mode: "per_delivery" | "recharge" | "monthly";
+}
+
 export interface BreedingEvent {
   id: string;
   animal_id: string;

@@ -19,6 +19,7 @@ import Expenses from "./pages/Expenses";
 import Health from "./pages/Health";
 import Breeding from "./pages/Breeding";
 import Settings from "./pages/Settings";
+import CustomerApp from "./pages/customer/CustomerApp";
 
 function Splash() {
   return (
@@ -66,11 +67,19 @@ function Gate() {
 export default function App() {
   return (
     <ThemeProvider>
-      <AuthProvider>
-        <BrowserRouter>
-          <Gate />
-        </BrowserRouter>
-      </AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/book/*" element={<CustomerApp />} />
+          <Route
+            path="/*"
+            element={
+              <AuthProvider>
+                <Gate />
+              </AuthProvider>
+            }
+          />
+        </Routes>
+      </BrowserRouter>
     </ThemeProvider>
   );
 }

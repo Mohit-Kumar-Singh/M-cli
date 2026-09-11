@@ -55,9 +55,11 @@ lands first. November 2026 is the aim for **Milestone 1**; the full feature set
 
 ## Milestone 4 — Customer-facing & offline
 
-- Customer login: self-serve order / pause / balance.
-- Recharge wallet + monthly invoicing for regulars (0003).
-- Offline delivery marking (PWA + local queue).
+- ✅ **Customer portal** (v0.8.0) — phone + PIN self-serve login (no Supabase
+  Auth account), place/edit daily order up to cutoff, pauses, order history,
+  pending dues, PIN change. Migrations `0004`/`0005`.
+- ⬜ Recharge wallet + monthly invoicing for regulars (0003).
+- ⬜ Offline delivery marking (PWA + local queue).
 
 ## Not scheduled
 

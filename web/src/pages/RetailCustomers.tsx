@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { Plus, Users } from "lucide-react";
+import { ExternalLink, Plus, Users } from "lucide-react";
 import { supabase, supabaseConfigured } from "../lib/supabase";
 import { addDays, isoDate } from "../lib/dates";
 import type { RetailCustomer } from "../types/db";
@@ -54,9 +54,19 @@ export default function RetailCustomers() {
         title="Retail customers"
         subtitle={loading ? undefined : `${rows.length} on the round`}
         actions={
-          <Button size="sm" icon={<Plus size={16} />} onClick={() => setEditing("new")}>
-            Add
-          </Button>
+          <>
+            <Button
+              size="sm"
+              variant="secondary"
+              icon={<ExternalLink size={15} />}
+              onClick={() => window.open("/book", "_blank", "noopener")}
+            >
+              Customer portal
+            </Button>
+            <Button size="sm" icon={<Plus size={16} />} onClick={() => setEditing("new")}>
+              Add
+            </Button>
+          </>
         }
       />
 
@@ -313,7 +323,43 @@ function CustomerForm({
           <Pauses customerId={initial.id} />
         </div>
       )}
+
+      {initial && (
+        <div className="mt-4 pt-4 border-t border-[var(--border-subtle)]">
+          <PortalAccess customerId={initial.id} />
+        </div>
+      )}
     </Card>
+  );
+}
+
+function PortalAccess({ customerId }: { customerId: string }) {
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState<string | null>(null);
+
+  async function reset() {
+    setBusy(true);
+    setMsg(null);
+    const { error } = await supabase.rpc("admin_reset_customer_pin", {
+      p_customer_id: customerId,
+    });
+    setBusy(false);
+    setMsg(error ? error.message : "PIN reset — they'll sign in with the last 4 digits of their phone.");
+  }
+
+  return (
+    <div>
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <div className="text-[13px] font-semibold text-ink-soft">Customer portal</div>
+          <div className="text-[12px] text-ink-mute">/book — order, pause, and check balance.</div>
+        </div>
+        <Button type="button" size="sm" variant="ghost" loading={busy} onClick={() => void reset()}>
+          Reset PIN
+        </Button>
+      </div>
+      {msg && <p className="text-[12px] text-ink-mute mt-2">{msg}</p>}
+    </div>
   );
 }
 

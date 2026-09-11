@@ -4,6 +4,22 @@ Milk Garage web app. Versions are `web/package.json` + a matching `vX.Y.Z` git
 tag, bumped on every user-visible push (see `docs/decisions/0010-versioning.md`).
 The running version is shown in the app (sidebar, "More" sheet, sign-in screen).
 
+## v0.8.0 — 2026-09-12 — Milestone 4: Customer portal
+
+- **Customer booking portal** at `/book` — phone + PIN sign-in (no Supabase
+  Auth account; first login defaults the PIN to the last 4 digits of the
+  registered phone). Customers can place/edit their own daily order up to
+  the 9 pm cutoff, add/remove delivery pauses, see upcoming and recent
+  orders, check pending dues, and change their PIN.
+- Access goes only through new `SECURITY DEFINER` RPC functions
+  (`customer_login`, `customer_get_orders`, `customer_place_order`, etc.) —
+  `retail_customers`/`retail_orders`/`retail_pauses` keep their existing
+  owner/delivery_runner-only RLS; verified as `anon` against a real customer
+  row, with the test writes cleaned up afterward.
+- Owner-side: a "Customer portal" link and a "Reset PIN" action on each
+  customer in Retail customers.
+- Migrations `0004` (enum value) + `0005` (portal schema, functions, grants).
+
 ## v0.7.0 — 2026-09-09 — Milestone 3: Breeding
 
 - **Breeding & reproduction** screen: log heat / service / pregnancy check /

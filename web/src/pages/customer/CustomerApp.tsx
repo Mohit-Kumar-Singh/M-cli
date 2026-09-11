@@ -1,0 +1,47 @@
+import { Routes, Route, Navigate } from "react-router-dom";
+import { CustomerAuthProvider, useCustomerAuth } from "../../lib/customerAuth";
+import { Wordmark } from "../../components/Wordmark";
+import { Spinner } from "../../ui";
+import CustomerLogin from "./CustomerLogin";
+import CustomerLayout from "./CustomerLayout";
+import CustomerOrder from "./CustomerOrder";
+import CustomerPauses from "./CustomerPauses";
+import CustomerAccount from "./CustomerAccount";
+
+function Splash() {
+  return (
+    <div className="min-h-full grid place-items-center p-4">
+      <div className="flex flex-col items-center gap-3 text-ink-mute">
+        <Wordmark />
+        <Spinner size={18} />
+      </div>
+    </div>
+  );
+}
+
+function CustomerGate() {
+  const { ready, customer } = useCustomerAuth();
+
+  if (!ready) return <Splash />;
+  if (!customer) return <CustomerLogin />;
+
+  return (
+    <Routes>
+      <Route element={<CustomerLayout />}>
+        <Route index element={<Navigate to="order" replace />} />
+        <Route path="order" element={<CustomerOrder />} />
+        <Route path="pauses" element={<CustomerPauses />} />
+        <Route path="account" element={<CustomerAccount />} />
+        <Route path="*" element={<Navigate to="order" replace />} />
+      </Route>
+    </Routes>
+  );
+}
+
+export default function CustomerApp() {
+  return (
+    <CustomerAuthProvider>
+      <CustomerGate />
+    </CustomerAuthProvider>
+  );
+}
