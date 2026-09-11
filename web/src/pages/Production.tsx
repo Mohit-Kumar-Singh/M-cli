@@ -126,13 +126,15 @@ export default function Production() {
                   {a.name ? <span className="text-ink-mute"> · {a.name}</span> : null}
                 </span>
               </span>
-              <Input
-                inputMode="decimal"
-                placeholder="kg"
-                className="w-24 text-right tnum"
-                value={qty[a.id] ?? ""}
-                onChange={(e) => setQty((q) => ({ ...q, [a.id]: e.target.value }))}
-              />
+              <div className="w-24 shrink-0">
+                <Input
+                  inputMode="decimal"
+                  placeholder="kg"
+                  className="text-right tnum"
+                  value={qty[a.id] ?? ""}
+                  onChange={(e) => setQty((q) => ({ ...q, [a.id]: e.target.value }))}
+                />
+              </div>
             </label>
           ))}
         </ListCard>

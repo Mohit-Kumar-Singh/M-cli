@@ -191,12 +191,14 @@ function DeliveryRow({
 
       {!done && !skipped && (
         <div className="mt-3 flex flex-wrap items-center gap-2">
-          <Input
-            inputMode="decimal"
-            className="w-20 text-right tnum"
-            value={qty}
-            onChange={(e) => setQty(e.target.value)}
-          />
+          <div className="w-20 shrink-0">
+            <Input
+              inputMode="decimal"
+              className="text-right tnum"
+              value={qty}
+              onChange={(e) => setQty(e.target.value)}
+            />
+          </div>
           <span className="text-[12px] text-ink-mute tnum">kg · ₹{due.toFixed(0)}</span>
           <Select
             className="w-auto"

@@ -4,6 +4,17 @@ Milk Garage web app. Versions are `web/package.json` + a matching `vX.Y.Z` git
 tag, bumped on every user-visible push (see `docs/decisions/0010-versioning.md`).
 The running version is shown in the app (sidebar, "More" sheet, sign-in screen).
 
+## v0.8.1 — 2026-09-12 — Fix quantity inputs squeezed on narrow screens
+
+- `.mg-input { width: 100% }` in `web/src/index.css` beat Tailwind's `w-*`
+  utilities applied directly to `<Input>` (same-specificity, later in the
+  stylesheet), so the qty inputs in Retail orders, Production, and
+  Deliveries stretched to fill their flex row instead of holding a fixed
+  width — overlapping sibling text on narrow (~375px) viewports.
+- Fixed by wrapping each `<Input>` in a `<div className="w-XX shrink-0">`
+  and dropping the width utility from the `Input` itself, matching the
+  pattern already used in the customer portal's order screen.
+
 ## v0.8.0 — 2026-09-12 — Milestone 4: Customer portal
 
 - **Customer booking portal** at `/book` — phone + PIN sign-in (no Supabase

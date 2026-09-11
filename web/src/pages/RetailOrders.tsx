@@ -188,14 +188,16 @@ export default function RetailOrders() {
                   {l.customer.area && <span>{l.customer.area}</span>}
                 </div>
               </div>
-              <Input
-                inputMode="decimal"
-                placeholder="kg"
-                className="w-24 text-right tnum"
-                value={l.qty}
-                disabled={frozen}
-                onChange={(e) => setQty(l.customer.id, e.target.value)}
-              />
+              <div className="w-24 shrink-0">
+                <Input
+                  inputMode="decimal"
+                  placeholder="kg"
+                  className="text-right tnum"
+                  value={l.qty}
+                  disabled={frozen}
+                  onChange={(e) => setQty(l.customer.id, e.target.value)}
+                />
+              </div>
             </div>
           ))}
         </ListCard>
