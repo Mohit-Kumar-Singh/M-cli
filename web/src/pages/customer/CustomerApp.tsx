@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { CustomerAuthProvider, useCustomerAuth } from "../../lib/customerAuth";
+import { useAppShellMeta } from "../../lib/appShell";
 import { Wordmark } from "../../components/Wordmark";
 import { Spinner } from "../../ui";
 import CustomerLogin from "./CustomerLogin";
@@ -39,6 +40,7 @@ function CustomerGate() {
 }
 
 export default function CustomerApp() {
+  useAppShellMeta(true);
   return (
     <CustomerAuthProvider>
       <CustomerGate />

@@ -4,6 +4,18 @@ Milk Garage web app. Versions are `web/package.json` + a matching `vX.Y.Z` git
 tag, bumped on every user-visible push (see `docs/decisions/0010-versioning.md`).
 The running version is shown in the app (sidebar, "More" sheet, sign-in screen).
 
+## v0.9.0 — 2026-09-12 — /book installs as its own app
+
+- The customer portal now installs to the home screen as a **separate app**
+  from the owner console — its own name ("Milk Garage — Order"), its own
+  `manifest-customer.webmanifest` (`start_url`/`scope` `/book`), distinct
+  iOS home-screen title. Same deployment, same service worker, same
+  Supabase backend as the owner dashboard — just a distinct installable
+  identity so a customer's phone shows a dedicated "order milk" icon
+  instead of the staff console.
+- `web/src/lib/appShell.ts` swaps the `<link rel="manifest">`, page title,
+  and `apple-mobile-web-app-title` on route mount (owner shell vs `/book`).
+
 ## v0.8.1 — 2026-09-12 — Fix quantity inputs squeezed on narrow screens
 
 - `.mg-input { width: 100% }` in `web/src/index.css` beat Tailwind's `w-*`

@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./lib/auth";
 import { ThemeProvider } from "./lib/theme";
+import { useAppShellMeta } from "./lib/appShell";
 import Layout from "./components/Layout";
 import { Wordmark } from "./components/Wordmark";
 import { Spinner } from "./ui";
@@ -34,6 +35,7 @@ function Splash() {
 
 function Gate() {
   const { ready, session, profile, configured } = useAuth();
+  useAppShellMeta(false);
 
   if (!ready) return <Splash />;
 

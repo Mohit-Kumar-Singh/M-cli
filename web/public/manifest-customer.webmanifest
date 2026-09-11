@@ -1,0 +1,23 @@
+{
+  "name": "Milk Garage — Order",
+  "short_name": "MG Order",
+  "description": "Order your daily milk, pause deliveries, and check your balance.",
+  "id": "/book",
+  "start_url": "/book",
+  "scope": "/book",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#1f6f5c",
+  "background_color": "#f5f5f1",
+  "categories": ["shopping", "food"],
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    {
+      "src": "/icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
