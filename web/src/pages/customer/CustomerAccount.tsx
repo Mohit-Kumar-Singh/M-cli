@@ -28,7 +28,8 @@ export default function CustomerAccount() {
       <Card className="mb-4">
         <dl className="space-y-2 text-[13px]">
           <Row label="Name" value={customer?.name ?? "—"} />
-          <Row label="Phone" value={customer?.phone ?? "—"} />
+          {customer?.phone && <Row label="Phone" value={customer.phone} />}
+          {customer?.email && <Row label="Email" value={customer.email} />}
           {customer?.area && <Row label="Area" value={customer.area} />}
           <Row label="Rate" value={`₹${customer?.price_per_kg ?? 60}/kg`} />
           <Row label="Type" value={customer?.type === "regular" ? "Regular" : "Casual"} />
@@ -45,7 +46,7 @@ export default function CustomerAccount() {
         </Card>
       )}
 
-      <ChangePin />
+      {customer?.phone && <ChangePin />}
 
       <Button
         variant="ghost"

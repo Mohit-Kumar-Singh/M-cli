@@ -256,6 +256,7 @@ export interface CustomerProfile {
   id: string;
   name: string;
   phone: string | null;
+  email: string | null;
   area: string | null;
   type: RetailCustomerType;
   fixed_daily_qty_kg: number | null;

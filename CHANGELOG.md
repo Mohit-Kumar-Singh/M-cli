@@ -4,6 +4,27 @@ Milk Garage web app. Versions are `web/package.json` + a matching `vX.Y.Z` git
 tag, bumped on every user-visible push (see `docs/decisions/0010-versioning.md`).
 The running version is shown in the app (sidebar, "More" sheet, sign-in screen).
 
+## v0.10.0 — 2026-09-13 — Self-service sign-up via email
+
+- New customers who haven't been added by the owner yet can now sign up on
+  `/book` with just their name + email — no SMS cost or DLT registration.
+  Verified via Supabase Auth's email magic link; on first successful
+  verification a casual `retail_customers` row is created automatically
+  (or linked, if the owner had already added them by that email).
+- Existing phone+PIN customers are unaffected — both paths mint the same
+  `customer_sessions` token, so the rest of the portal (Order/Pauses/
+  Account) needed no changes.
+- New RPC `customer_email_login` (migration `0006`), grantable only to
+  `authenticated` (a real, Supabase-Auth-verified session) — a spoofed
+  `auth.uid()` is rejected by the `auth.users` foreign key, verified by
+  attempting exactly that as `authenticated` with a fabricated JWT claim.
+- **Requires one manual step in the Supabase dashboard**: add
+  `https://m-cli.vercel.app/book/verify` under Authentication → URL
+  Configuration → Redirect URLs, or the magic link will fail to return to
+  the app. Supabase's built-in mailer is rate-limited — fine for early
+  testing, but wire up custom SMTP (e.g. Resend's free tier) there before
+  relying on this for real customer growth.
+
 ## v0.9.0 — 2026-09-12 — /book installs as its own app
 
 - The customer portal now installs to the home screen as a **separate app**

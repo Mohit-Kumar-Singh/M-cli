@@ -15,6 +15,9 @@ interface CustomerAuthState {
   customer: CustomerProfile | null;
   configured: boolean;
   login: (phone: string, pin: string) => Promise<string | null>;
+  /** Adopts a session token obtained outside the phone+PIN flow (email
+   *  magic-link callback). Returns whether the profile actually loaded. */
+  completeSession: (token: string) => Promise<boolean>;
   logout: () => Promise<void>;
   refresh: () => Promise<void>;
 }
@@ -88,6 +91,11 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
         storeToken(row.session_token);
         const ok = await loadProfile(row.session_token);
         return ok ? null : "Couldn't load your account. Try again.";
+      },
+      async completeSession(t: string) {
+        setToken(t);
+        storeToken(t);
+        return await loadProfile(t);
       },
       async logout() {
         if (token) await supabase.rpc("customer_logout", { p_token: token });
