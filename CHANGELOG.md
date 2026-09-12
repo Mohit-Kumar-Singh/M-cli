@@ -4,6 +4,21 @@ Milk Garage web app. Versions are `web/package.json` + a matching `vX.Y.Z` git
 tag, bumped on every user-visible push (see `docs/decisions/0010-versioning.md`).
 The running version is shown in the app (sidebar, "More" sheet, sign-in screen).
 
+## v0.11.0 — 2026-09-13 — Google sign-in + redirect fix
+
+- **Continue with Google** on the sign-up tab — one tap, no email round
+  trip. Reuses the same `/book/verify` callback and `customer_email_login`
+  RPC as email sign-up (0006); a customer's name falls back to Google's
+  profile name when they don't type one in.
+- Fixed the email magic link redirecting to `localhost:3000` in
+  production: the redirect URL now drops query params (name/phone are
+  stashed in `sessionStorage` before redirecting instead), since an
+  inexact match against Supabase's Auth redirect allow-list silently
+  falls back to the project's Site URL.
+- **Requires Google OAuth to be enabled in Supabase** (Authentication →
+  Providers → Google, with a Client ID/Secret from Google Cloud Console)
+  — a one-time dashboard step only the project owner can do.
+
 ## v0.10.0 — 2026-09-13 — Self-service sign-up via email
 
 - New customers who haven't been added by the owner yet can now sign up on

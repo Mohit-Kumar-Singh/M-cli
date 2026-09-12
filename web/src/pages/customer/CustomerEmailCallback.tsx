@@ -44,10 +44,24 @@ export default function CustomerEmailCallback() {
         return;
       }
 
-      const params = new URLSearchParams(window.location.search);
+      // Stashed before redirecting (email form only — Google has no form
+      // step). Read via sessionStorage rather than query params so the
+      // redirect URL stays a plain, exact-match string for Supabase's
+      // Auth redirect allow-list.
+      let name: string | undefined;
+      let phone: string | undefined;
+      try {
+        name = sessionStorage.getItem("mg_signup_name") ?? undefined;
+        phone = sessionStorage.getItem("mg_signup_phone") ?? undefined;
+        sessionStorage.removeItem("mg_signup_name");
+        sessionStorage.removeItem("mg_signup_phone");
+      } catch {
+        // ignore — customer_email_login falls back to the Google/email name
+      }
+
       const { data, error: rpcError } = await supabase.rpc("customer_email_login", {
-        p_name: params.get("name") ?? undefined,
-        p_phone: params.get("phone") ?? undefined,
+        p_name: name,
+        p_phone: phone,
       });
       await supabase.auth.signOut();
 
